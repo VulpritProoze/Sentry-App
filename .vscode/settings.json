@@ -1,0 +1,35 @@
+{
+  // Point to the virtual environment
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/venv/Scripts/python.exe",
+
+  // Disable Pylint (we're using Ruff instead)
+  "pylint.enabled": false,
+  "python.linting.pylintEnabled": false,
+
+  // Cursor Pyright Configuration
+  "cursorpyright.analysis.typeCheckingMode": "basic",
+  "cursorpyright.analysis.extraPaths": ["${workspaceFolder}/backend/sentry"],
+
+  // ======= Pyright/Pylance Settings w/o Cursor Pyright =========
+  // Standard Pyright settings (for VS Code or if Pyright extension is installed)
+  "pyright.analysis.typeCheckingMode": "basic",
+  "pyright.analysis.extraPaths": ["${workspaceFolder}/backend/sentry"],
+  "pyright.analysis.autoSearchPaths": true,
+
+  // Python analysis settings (Pylance/Python extension)
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.extraPaths": ["${workspaceFolder}/backend/sentry"],
+  "python.analysis.autoSearchPaths": true,
+
+  // Ruff Configuration
+  "ruff.enable": true,
+
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+}
