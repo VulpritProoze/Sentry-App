@@ -14,6 +14,11 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255, blank=True)  # Didn't know null is discouraged in Django
     last_name = models.CharField(max_length=255)
+    profile_picture = models.ImageField(
+        max_length=255,
+        upload_to="user/images/profile_pictures/",
+        blank=True,
+    )
 
     objects = UserManager()
 
