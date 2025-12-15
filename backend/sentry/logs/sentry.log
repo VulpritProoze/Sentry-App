@@ -624,3 +624,14 @@ INFO 2025-12-16 01:07:19 autoreload D:\User Folder\Magus Files\RRA Personal Fold
 INFO 2025-12-16 01:07:21 autoreload Watching for file changes with StatReloader
 ERROR 2025-12-16 01:09:24 log Internal Server Error: /api/v1/core/auth/email/reset-password
 ERROR 2025-12-16 01:09:24 log "POST /api/v1/core/auth/email/reset-password HTTP/1.1" 500 108
+INFO 2025-12-16 01:09:46 log "POST /api/v1/core/auth/email/reset-password HTTP/1.1" 200 43
+INFO 2025-12-16 01:18:35 autoreload D:\User Folder\Magus Files\RRA Personal Folder\HelloWorld\React Native\Sentry\Sentry-App\backend\sentry\sentry\settings\config.py changed, reloading.
+INFO 2025-12-16 01:18:45 autoreload Watching for file changes with StatReloader
+INFO 2025-12-16 01:21:06 autoreload D:\User Folder\Magus Files\RRA Personal Folder\HelloWorld\React Native\Sentry\Sentry-App\backend\sentry\device\router\device_router.py changed, reloading.
+INFO 2025-12-16 01:21:10 autoreload Watching for file changes with StatReloader
+INFO 2025-12-16 01:22:06 autoreload D:\User Folder\Magus Files\RRA Personal Folder\HelloWorld\React Native\Sentry\Sentry-App\backend\sentry\device\router\device_router.py changed, reloading.
+INFO 2025-12-16 01:22:09 autoreload Watching for file changes with StatReloader
+INFO 2025-12-16 01:22:22 autoreload D:\User Folder\Magus Files\RRA Personal Folder\HelloWorld\React Native\Sentry\Sentry-App\backend\sentry\device\router\device_router.py changed, reloading.
+INFO 2025-12-16 01:22:24 autoreload Watching for file changes with StatReloader
+INFO 2025-12-16 01:23:22 autoreload D:\User Folder\Magus Files\RRA Personal Folder\HelloWorld\React Native\Sentry\Sentry-App\backend\sentry\device\router\device_router.py changed, reloading.
+INFO 2025-12-16 01:23:24 autoreload Watching for file changes with StatReloader

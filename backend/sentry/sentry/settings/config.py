@@ -99,6 +99,10 @@ class Settings(BaseSettings):
         default="http://localhost:8000",
         description="The URL of the API",
     )
+    device_api_key: str | None = Field(
+        default=None,
+        description="The API key for the device",
+    )
 
     @field_validator(
         "django_allowed_hosts",

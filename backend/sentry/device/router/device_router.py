@@ -1,12 +1,13 @@
 """Device router."""
 
+from core.auth.api_key import DeviceAPIKeyAuth
 from django.http import HttpRequest
 from ninja import Router
 
 from device.controllers.device_controller import receive_device_data
 from device.schemas import DeviceDataRequest, DeviceDataResponse
 
-device_router = Router(tags=["device"])
+device_router = Router(tags=["device"], auth=DeviceAPIKeyAuth())
 
 
 @device_router.post("/data", response=DeviceDataResponse)
