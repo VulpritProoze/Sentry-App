@@ -1,4 +1,5 @@
 #include "ServerHandler.h"
+#include "APIKeyStorage.h"
 #include <Arduino.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -71,11 +72,24 @@ bool postJson(const String& path, const String& jsonPayload) {
     String fullUrl = baseUrl + route;
     Serial.println("POSTing JSON to: " + fullUrl);
 
+    // Get API key
+    String apiKey = getAPIKey();
+    if (apiKey.length() == 0) {
+        Serial.println("ERROR: API key not configured!");
+        return false;
+    }
+
     HTTPClient http;
     http.begin(fullUrl);
     http.addHeader("Content-Type", "application/json");
+    http.addHeader("X-API-Key", apiKey);
 
     int code = http.POST(jsonPayload);
+    
+    if (code == 401) {
+        Serial.println("ERROR: Authentication failed - check API key!");
+    }
+    
     http.end();
 
     if (code > 0) {

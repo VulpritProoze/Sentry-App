@@ -53,3 +53,7 @@ venv/
 dist/
 .ruff_cache/
 # backend/**/logs/
+
+
+# ============= DEVICE =============
+device/Sentry_Device/secrets.h
