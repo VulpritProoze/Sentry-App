@@ -18,34 +18,55 @@ User = get_user_model()
 class JwtAuth(HttpBearer):
     """JWT authentication."""
 
-    def authenticate(self, request: HttpRequest, token: str) -> UserSchema | None:  # noqa: ARG002
+    def authenticate(self, request: HttpRequest, token: str) -> int | None:
         """Authenticate the user."""
         try:
             payload = decode_jwt_token(token)
-            user_id = payload.get("sub")
-            user = User.objects.get(id=user_id)
 
-            if not user.is_active:
-                raise AuthenticationError(
-                    message=AuthMessages.JwtAuth.INACTIVE_USER,
-                )
-
-            return UserSchema.model_validate(user)
+        except AuthenticationError:
+            # Re-raise AuthenticationError (from decode_jwt_token or our own)
+            raise
         except User.DoesNotExist as e:
             raise AuthenticationError(
                 message=AuthMessages.JwtAuth.USER_NOT_FOUND,
             ) from e
-        except JWTError as e:
+
+        # Get user_id from sub claim (stored as string in JWT)
+        user_id_str = payload.get("sub")
+        if not user_id_str:
             raise AuthenticationError(
-                message=AuthMessages.JwtAuth.INVALID_TOKEN,
+                message=f"{AuthMessages.JwtAuth.INVALID_TOKEN} (User ID not found in token)",
+            )
+
+        # Convert string user_id back to int for database query
+        try:
+            user_id = int(user_id_str)
+        except (ValueError, TypeError) as e:
+            raise AuthenticationError(
+                message=f"{AuthMessages.JwtAuth.INVALID_TOKEN} (Invalid user ID format)",
             ) from e
+
+        user = User.objects.get(id=user_id)
+
+        request.user = user  # pyright: ignore[reportAttributeAccessIssue]
+        return user_id
 
 
 def decode_jwt_token(token: str) -> dict:
-    """Decode the JWT token."""
-    # jwt.decode returns a dictionary of the payload
+    """Decode the JWT token.
+
+    Args:
+        token: The JWT token string to decode
+
+    Returns:
+        Dictionary containing the decoded payload
+
+    Raises:
+        AuthenticationError: If token is invalid, expired, or malformed
+
+    """
     try:
-        decoded_jwt = jwt.decode(
+        return jwt.decode(
             token,
             settings.jwt_secret_key,
             algorithms=[settings.jwt_algorithm],
@@ -55,8 +76,6 @@ def decode_jwt_token(token: str) -> dict:
             message=AuthMessages.JwtAuth.INVALID_TOKEN,
         ) from e
 
-    return decoded_jwt
-
 
 def create_access_token(data: dict, expires_in_mins: timedelta) -> str:
     """Create an access token."""
@@ -64,7 +83,7 @@ def create_access_token(data: dict, expires_in_mins: timedelta) -> str:
     expire = datetime.now(UTC) + expires_in_mins
     to_encode.update({"exp": expire, "type": "access"})
     try:
-        encoded_jwt = jwt.encode(
+        decoded_kwt = jwt.encode(
             to_encode,
             settings.jwt_secret_key,
             algorithm=settings.jwt_algorithm,
@@ -73,7 +92,7 @@ def create_access_token(data: dict, expires_in_mins: timedelta) -> str:
         raise AuthenticationError(
             message=AuthMessages.JwtAuth.INVALID_TOKEN,
         ) from e
-    return encoded_jwt
+    return decoded_kwt
 
 
 def create_refresh_token(data: dict, expires_in_mins: timedelta) -> str:
@@ -108,6 +127,7 @@ def create_access_token_from_refresh_token(refresh_token_payload: dict) -> str:
     if not access_token_expires:
         raise ValueError(EnvMessages.Jwt.MISSING_ENV_ACCESS_TOKEN_EXPIRE_IN_MINS)
 
+    # sub is already a string from the refresh token payload, so use it directly
     return create_access_token(
         data={"sub": refresh_token_payload.get("sub"), "username": refresh_token_payload.get("username")},
         expires_in_mins=access_token_expires,
@@ -119,8 +139,9 @@ def create_token_pair(user: UserSchema) -> dict[str, str]:
     access_token_expires = timedelta(minutes=settings.jwt_access_token_expire_in_mins)
     if not access_token_expires:
         raise ValueError(EnvMessages.Jwt.MISSING_ENV_ACCESS_TOKEN_EXPIRE_IN_MINS)
+    # Convert user.id to string (JWT sub claim must be a string)
     access_token = create_access_token(
-        data={"sub": user.id, "username": user.username},
+        data={"sub": str(user.id), "username": user.username},
         expires_in_mins=access_token_expires,
     )
 
@@ -128,7 +149,7 @@ def create_token_pair(user: UserSchema) -> dict[str, str]:
     if not refresh_token_expires:
         raise ValueError(EnvMessages.Jwt.MISSING_ENV_REFRESH_TOKEN_EXPIRE_IN_DAYS)
     refresh_token = create_refresh_token(
-        data={"sub": user.id, "username": user.username},
+        data={"sub": str(user.id), "username": user.username},
         expires_in_mins=refresh_token_expires * 24,
     )
     return {

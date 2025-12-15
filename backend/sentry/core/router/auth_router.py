@@ -1,5 +1,7 @@
 """Auth router."""
 
+from typing import Any
+
 from django.http import HttpRequest
 from ninja import Router
 
@@ -10,7 +12,6 @@ from core.schemas import (
     LoginResponse,
     RefreshTokenRequest,
     RegisterRequest,
-    UserSchema,
 )
 
 auth_router = Router(tags=["auth"])
@@ -43,10 +44,9 @@ def refresh_token_endpoint(
     return refresh_token(request, data)
 
 
-@auth_router.get("/current", auth=JwtAuth())
+@auth_router.get("/me", auth=JwtAuth())
 def current_user_endpoint(
     request: HttpRequest,
-    user: UserSchema,
-) -> UserSchema:
-    """Get current authenticated user endpoint."""
-    return get_current_user(user)
+) -> dict[str, Any]:
+    """Get current authenticated user."""
+    return get_current_user(request)

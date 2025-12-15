@@ -19,7 +19,7 @@ class RegisterRequest(Schema):
     password: str
     first_name: str
     last_name: str
-    middle_name: str | None = None
+    middle_name: str | None = ""
 
 
 class LoginResponse(Schema):

@@ -52,3 +52,4 @@ venv/
 /static
 dist/
 .ruff_cache/
+# backend/**/logs/

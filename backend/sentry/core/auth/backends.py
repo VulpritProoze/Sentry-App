@@ -1,16 +1,16 @@
 """Customized authentication backends."""
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
-from django.http import HttpRequest
+
+from core.models import User
 
 if TYPE_CHECKING:
-    from django.contrib.auth.models import AbstractUser
-
-User = get_user_model()
+    from django.http import HttpRequest
 
 
 class EmailOrUsernameBackend(ModelBackend):
@@ -23,7 +23,7 @@ class EmailOrUsernameBackend(ModelBackend):
         email: str | None = None,
         password: str | None = None,
         **_kwargs,  # noqa: ANN003
-    ) -> "AbstractUser | None":
+    ) -> User | None:
         """Authenticate the user by email or username.
 
         Args:
@@ -53,7 +53,7 @@ class EmailOrUsernameBackend(ModelBackend):
             user = User.objects.get(
                 Q(username=lookup_value) | Q(email=lookup_value),
             )
-        except User.DoesNotExist:
+        except User.DoesNotExist:  # pyright: ignore[reportAttributeAccessIssue]
             # Run set_password to prevent timing attacks
             User().set_password(password)
             return None

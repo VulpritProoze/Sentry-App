@@ -47,6 +47,18 @@ class Settings(BaseSettings):
         default=None,
         description="The URL of the database to use",
     )
+    admin_username: str | None = Field(
+        default=None,
+        description="The username of the admin user",
+    )
+    admin_email: str | None = Field(
+        default=None,
+        description="The email of the admin user",
+    )
+    admin_password: str | None = Field(
+        default=None,
+        description="The password of the admin user",
+    )
 
     @field_validator(
         "django_allowed_hosts",

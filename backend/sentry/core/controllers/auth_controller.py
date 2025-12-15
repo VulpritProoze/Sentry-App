@@ -1,5 +1,7 @@
 """Auth router controller."""
 
+from typing import Any
+
 from common.constants.messages import AuthMessages
 from django.contrib.auth import authenticate, get_user_model
 from django.db.models import Q
@@ -213,14 +215,17 @@ def refresh_token(
         ) from None
 
 
-def get_current_user(user: UserSchema) -> UserSchema:
+def get_current_user(request: HttpRequest) -> dict[str, Any]:  # noqa: ARG001
     """Get current authenticated user.
 
     Args:
+        request: The HTTP request object
         user: The authenticated user from JWT token (injected by Django Ninja)
 
     Returns:
         UserSchema of the current authenticated user
 
     """
-    return user
+    return {
+        "message": "User is currently authenticated",
+    }

@@ -2,6 +2,7 @@
 
 from .base import (
     AUTH_PASSWORD_VALIDATORS,
+    AUTH_USER_MODEL,
     AUTHENTICATION_BACKENDS,
     BASE_DIR,
     DATABASES,
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "ninja.compatibility.files.fix_request_files_middleware",
     # "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     # "django.middleware.csrf.CsrfViewMiddleware",
