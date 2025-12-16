@@ -1,15 +1,19 @@
 """Auth router controller."""
 
 import logging
+from datetime import UTC, datetime
 from typing import Any
 
+from common.constants.choices import BlacklistableTokenType
 from common.constants.messages import AuthMessages
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
 from django.http import HttpRequest
-from jose import JWTError
+from jose import JWTError, jwt
 from ninja.errors import AuthenticationError, HttpError, ValidationError
+from sentry.settings.config import settings
 
 from core.auth.jwt import (
     create_access_token_from_refresh_token,
@@ -19,7 +23,15 @@ from core.auth.jwt import (
     decode_and_verify_email_token,
     decode_jwt_token,
 )
-from core.auth.utils import get_access_token_from_header, validate_access_token
+from core.auth.utils import (
+    blacklist_expired_refresh_token,
+    blacklist_refresh_token,
+    get_access_token_from_header,
+    get_user_from_refresh_token,
+    validate_access_token,
+    validate_refresh_token_payload,
+)
+from core.models.tokens import TokenBlacklist
 from core.schemas import (
     EmailVerificationRequest,
     ForgotPasswordRequest,
@@ -170,9 +182,11 @@ def refresh_token(
     Flow:
     1. Get refresh token from request
     2. Validate access token (from Authorization header) - if not expired, return 400
-    3. Validate refresh token - if expired, return 404 (user must login)
-    4. If authenticated and access token expired, create new access token from refresh token
-    5. Return old refresh token + new access token
+    3. Check if refresh token is blacklisted
+    4. Validate refresh token - if expired, return 404 (user must login)
+    5. If authenticated and access token expired, create new access token from refresh token
+    6. Blacklist the old refresh token
+    7. Return old refresh token + new access token
 
     Args:
         request (HttpRequest): The request object (contains Authorization header)
@@ -194,41 +208,28 @@ def refresh_token(
     if access_token_str:
         validate_access_token(access_token_str)
 
-    # Step 2 (continued): Validate refresh token
+    # Step 3: Check if refresh token is blacklisted
+    if TokenBlacklist.is_token_blacklisted(refresh_token_str):
+        raise AuthenticationError(
+            message=f"{AuthMessages.JwtAuth.INVALID_TOKEN} (Refresh token has been blacklisted)",
+        )
+
+    # Step 4: Validate refresh token
     try:
         refresh_payload = decode_jwt_token(refresh_token_str)
-
-        # Verify it's a refresh token
-        token_type = refresh_payload.get("type")
-        if token_type != "refresh":  # noqa: S105
-            raise AuthenticationError(
-                message=f"{AuthMessages.JwtAuth.INVALID_TOKEN} (Invalid token type: {token_type})",
-            )
-
-        # Check if refresh token is expired (decode_jwt_token raises if expired)
-        # If we get here, refresh token is valid
-
-        # Step 4: Get user ID from refresh token
-        user_id = refresh_payload.get("sub")
-        if not user_id:
-            raise AuthenticationError(
-                status_code=404,
-                message=f"{AuthMessages.JwtAuth.INVALID_TOKEN} (User ID not found in refresh token)",
-            )
-
-        # Get user from database
-        user = User.objects.get(id=user_id)
-
-        # Check if user is active
-        if not user.is_active:
-            raise AuthenticationError(
-                message=f"{AuthMessages.JwtAuth.INACTIVE_USER} (User is inactive)",
-            )
+        user_id = validate_refresh_token_payload(refresh_payload)
+        get_user_from_refresh_token(user_id)  # Validates user exists and is active
 
         # Step 5: Create new access token from refresh token
         new_access_token = create_access_token_from_refresh_token(refresh_payload)
 
-        # Step 6: Return old refresh token + new access token
+        # Step 6: Blacklist the old refresh token
+        exp_timestamp = refresh_payload.get("exp")
+        if exp_timestamp:
+            expires_at = datetime.fromtimestamp(exp_timestamp, tz=UTC)
+            blacklist_refresh_token(refresh_token_str, expires_at)
+
+        # Step 7: Return old refresh token + new access token
         return LoginResponse(
             access_token=new_access_token,
             refresh_token=refresh_token_str,  # Return the same refresh token
@@ -237,15 +238,11 @@ def refresh_token(
         )
 
     except JWTError:
-        # Step 2: Refresh token expired or invalid - return 404
+        # Step 4: Refresh token expired or invalid - blacklist it and return 404
+        blacklist_expired_refresh_token(refresh_token_str)
         raise HttpError(
             status_code=404,
             message=f"{AuthMessages.JwtAuth.INVALID_TOKEN} (Refresh token expired or invalid)",
-        ) from None
-    except User.DoesNotExist:
-        raise HttpError(
-            status_code=404,
-            message=AuthMessages.JwtAuth.USER_NOT_FOUND,
         ) from None
 
 
@@ -344,12 +341,41 @@ def verify_email_controller(
         AuthenticationError: If token validation fails
 
     """
+    # Check if token is blacklisted
+    if TokenBlacklist.is_token_blacklisted(data.token):
+        raise HttpError(
+            status_code=404,
+            message=f"{AuthMessages.JwtAuth.INVALID_TOKEN} (Email verification token has been blacklisted)",
+        )
+
     try:
         payload = decode_and_verify_email_token(
             token=data.token,
             expected_type="email_verification",
         )
     except AuthenticationError as e:
+        # Blacklist expired/invalid token
+        try:
+            decoded = jwt.decode(
+                data.token,
+                settings.jwt_secret_key,
+                algorithms=[settings.jwt_algorithm],
+                options={"verify_signature": False, "verify_exp": False},
+            )
+            exp_timestamp = decoded.get("exp")
+            if exp_timestamp:
+                expires_at = datetime.fromtimestamp(exp_timestamp, tz=UTC)
+                TokenBlacklist.blacklist_token(
+                    token=data.token,
+                    token_type=BlacklistableTokenType.EMAIL_VERIFICATION,
+                    expires_at=expires_at,
+                    is_manually_blacklisted=False,
+                )
+        except (JWTError, ValueError, TypeError) as decode_error:
+            # If we can't decode, log and continue with the error
+            logger = logging.getLogger("core")
+            logger.debug("Could not decode email verification token for blacklisting: %s", decode_error)
+
         raise HttpError(
             status_code=404,
             message=AuthMessages.JwtAuth.INVALID_TOKEN,
@@ -374,6 +400,17 @@ def verify_email_controller(
     # Verify user
     user.is_verified = True
     user.save(update_fields=["is_verified"])
+
+    # Blacklist the used verification token
+    exp_timestamp = payload.get("exp")
+    if exp_timestamp:
+        expires_at = datetime.fromtimestamp(exp_timestamp, tz=UTC)
+        TokenBlacklist.blacklist_token(
+            token=data.token,
+            token_type=BlacklistableTokenType.EMAIL_VERIFICATION,
+            expires_at=expires_at,
+            is_manually_blacklisted=False,
+        )
 
     return MessageResponse(message=AuthMessages.EmailVerification.EMAIL_VERIFIED)
 
@@ -430,12 +467,41 @@ def reset_password_controller(
         AuthenticationError: If token validation fails
 
     """
+    # Check if token is blacklisted
+    if TokenBlacklist.is_token_blacklisted(data.token):
+        raise HttpError(
+            status_code=404,
+            message=f"{AuthMessages.JwtAuth.INVALID_TOKEN} (Password reset token has been blacklisted)",
+        )
+
     try:
         payload = decode_and_verify_email_token(
             token=data.token,
             expected_type="password_reset",
         )
     except AuthenticationError as e:
+        # Blacklist expired/invalid token
+        try:
+            decoded = jwt.decode(
+                data.token,
+                settings.jwt_secret_key,
+                algorithms=[settings.jwt_algorithm],
+                options={"verify_signature": False, "verify_exp": False},
+            )
+            exp_timestamp = decoded.get("exp")
+            if exp_timestamp:
+                expires_at = datetime.fromtimestamp(exp_timestamp, tz=UTC)
+                TokenBlacklist.blacklist_token(
+                    token=data.token,
+                    token_type=BlacklistableTokenType.PASSWORD_RESET,
+                    expires_at=expires_at,
+                    is_manually_blacklisted=False,
+                )
+        except (JWTError, ValueError, TypeError) as decode_error:
+            # If we can't decode, log and continue with the error
+            logger = logging.getLogger("core")
+            logger.debug("Could not decode password reset token for blacklisting: %s", decode_error)
+
         raise HttpError(
             status_code=404,
             message=AuthMessages.JwtAuth.INVALID_TOKEN,
@@ -460,13 +526,31 @@ def reset_password_controller(
     # Update password
     try:
         validate_password(data.new_password)
-    except ValidationError as e:
-        raise HttpError(
-            status_code=400,
-            message=str(e),
-        ) from e
+    except DjangoValidationError as e:
+        # Django ValidationError can have multiple error messages
+        # Format as dict objects similar to register function
+        error_messages = e.messages if hasattr(e, "messages") else [str(e)]
+        errors = [
+            {
+                "field": "new_password",
+                "message": msg,
+            }
+            for msg in error_messages
+        ]
+        raise ValidationError(errors=errors) from e
 
     user.set_password(data.new_password)
     user.save(update_fields=["password"])
+
+    # Blacklist the used password reset token
+    exp_timestamp = payload.get("exp")
+    if exp_timestamp:
+        expires_at = datetime.fromtimestamp(exp_timestamp, tz=UTC)
+        TokenBlacklist.blacklist_token(
+            token=data.token,
+            token_type=BlacklistableTokenType.PASSWORD_RESET,
+            expires_at=expires_at,
+            is_manually_blacklisted=False,
+        )
 
     return MessageResponse(message=AuthMessages.PasswordReset.PASSWORD_RESET)

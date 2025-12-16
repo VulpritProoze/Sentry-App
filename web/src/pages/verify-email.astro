@@ -101,7 +101,7 @@ import Layout from '../layouts/Layout.astro';
 						verifyBtn.disabled = true;
 						verifyBtn.textContent = 'Email Verified ✓';
 					} else {
-						showMessage(data.message || 'Verification failed. The token may be invalid or expired.', true);
+						showMessage(data.message || 'Verification failed. The token may be invalid or email has already been verified.', true);
 					}
 				} catch (error) {
 					showMessage('An error occurred while verifying your email. Please try again later.', true);

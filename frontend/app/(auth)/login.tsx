@@ -108,8 +108,7 @@ const login = () => {
   };
 
   const handleForgotPassword = () => {
-    // TODO: Implement forgot password navigation
-    console.log("Forgot password");
+    router.push("/(auth)/forgot-password");
   };
 
   return (

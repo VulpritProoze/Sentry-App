@@ -2,10 +2,12 @@
 
 from .audit.audit_choices import AuditAction, AuditObjectType
 from .misc.model_name_choices import ModelNameChoices
+from .token import BlacklistableTokenType
 
 __all__ = [
     "AuditAction",
     "AuditObjectType",
+    "BlacklistableTokenType",
     "ModelNameChoices",
 ]
 
