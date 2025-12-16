@@ -1,5 +1,6 @@
 """Auth router."""
 
+import logging
 from typing import Any
 
 from django.http import HttpRequest
@@ -39,6 +40,15 @@ def login_endpoint(
     credentials: LoginRequest,
 ) -> LoginResponse:
     """Login endpoint."""
+    logger = logging.getLogger("core")
+
+    # Log request body/credentials
+    logger.info("=== LOGIN ENDPOINT REQUEST BODY ===")
+    logger.info("Username: '%s'", credentials.username)
+    logger.info("Email: '%s'", credentials.email)
+    logger.info("Password present: %s", bool(credentials.password))
+    logger.info("===================================")
+
     return login(request, credentials)
 
 

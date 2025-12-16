@@ -1,0 +1,116 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+	title="Verify Your Email - Sentry"
+	description="Verify your email address to complete your Sentry account setup"
+>
+	<main class="min-h-screen flex items-center justify-center px-4">
+		<div class="max-w-md w-full">
+			<div class="bg-white rounded-lg shadow-md p-8">
+				<!-- Header -->
+				<div class="text-center mb-6">
+					<div class="text-5xl mb-4">✉️</div>
+					<h1 class="text-2xl font-bold text-gray-900 mb-2">
+						Verify Your Email
+					</h1>
+					<p class="text-gray-600">
+						Click the button below to verify your email address and activate your account
+					</p>
+				</div>
+
+				<!-- Status Messages -->
+				<div id="status-message" class="hidden mb-4 p-4 rounded-lg"></div>
+
+				<!-- Verify Button -->
+				<button 
+					id="verify-btn"
+					class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition mb-4 disabled:bg-gray-400 disabled:cursor-not-allowed"
+				>
+					<span id="btn-text">Verify Email</span>
+					<span id="btn-loading" class="hidden">Verifying...</span>
+				</button>
+
+				<!-- Back to Home -->
+				<div class="text-center">
+					<a href="/" class="text-blue-600 hover:text-blue-700 text-sm">
+						← Back to Home
+					</a>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<script>
+		// Define API_BASE in the script context
+		const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
+		const API_BASE = `${API_URL}/api/v1`;
+
+		// Get token from URL
+		const urlParams = new URLSearchParams(window.location.search);
+		const token = urlParams.get('token');
+		
+		const verifyBtn = document.getElementById('verify-btn') as HTMLButtonElement;
+		const btnText = document.getElementById('btn-text') as HTMLSpanElement;
+		const btnLoading = document.getElementById('btn-loading') as HTMLSpanElement;
+		const statusMessage = document.getElementById('status-message') as HTMLDivElement;
+
+		function showMessage(message: string, isError: boolean = false) {
+			statusMessage.textContent = message;
+			statusMessage.className = `mb-4 p-4 rounded-lg ${
+				isError 
+					? 'bg-red-100 text-red-700 border border-red-300' 
+					: 'bg-green-100 text-green-700 border border-green-300'
+			}`;
+			statusMessage.classList.remove('hidden');
+		}
+
+		function setLoading(loading: boolean) {
+			verifyBtn.disabled = loading;
+			if (loading) {
+				btnText.classList.add('hidden');
+				btnLoading.classList.remove('hidden');
+			} else {
+				btnText.classList.remove('hidden');
+				btnLoading.classList.add('hidden');
+			}
+		}
+
+		if (!token) {
+			showMessage('No verification token found in URL. Please check your email for the verification link.', true);
+			verifyBtn.disabled = true;
+		} else {
+			verifyBtn.addEventListener('click', async () => {
+				setLoading(true);
+				statusMessage.classList.add('hidden');
+
+				try {
+					const response = await fetch(`${API_BASE}/core/auth/email/verify`, {
+						method: 'POST',
+						headers: { 
+							'Content-Type': 'application/json' 
+						},
+						body: JSON.stringify({ token })
+					});
+
+					const data = await response.json();
+
+					if (response.ok) {
+						showMessage(data.message || 'Email verified successfully! You can now log in to your account.', false);
+						verifyBtn.disabled = true;
+						verifyBtn.textContent = 'Email Verified ✓';
+					} else {
+						showMessage(data.message || 'Verification failed. The token may be invalid or expired.', true);
+					}
+				} catch (error) {
+					showMessage('An error occurred while verifying your email. Please try again later.', true);
+					console.error('Verification error:', error);
+				} finally {
+					setLoading(false);
+				}
+			});
+		}
+	</script>
+</Layout>
+

@@ -23,22 +23,29 @@
                                 {% if user_name %}Hello {{ user_name }},{% else %}Hello,{% endif %}
                             </p>
                             <p style="margin: 0 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
-                                Thank you for signing up! To verify your email address, use the following token:
+                                Thank you for signing up! Please verify your email address by clicking the button below:
                             </p>
-                            <!-- Token Box -->
-                            <div style="background-color: #f8f9fa; border: 2px solid #e9ecef; border-radius: 6px; padding: 20px; margin: 30px 0; text-align: center;">
-                                <p style="margin: 0; font-family: 'Courier New', monospace; font-size: 18px; font-weight: 600; color: #4CAF50; word-break: break-all;">
+                            <!-- Verification Button -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{ verification_url }}" style="display: inline-block; background-color: #4CAF50; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: 600; font-size: 16px;">
+                                    Verify Email Address
+                                </a>
+                            </div>
+                            {% if debug %}
+                            <!-- Alternative: Token for API use (DEBUG only) -->
+                            <p style="margin: 30px 0 20px; color: #666666; font-size: 14px; line-height: 1.6;">
+                                Or use this token manually:
+                            </p>
+                            <div style="background-color: #f8f9fa; border: 2px solid #e9ecef; border-radius: 6px; padding: 20px; margin: 20px 0; text-align: center;">
+                                <p style="margin: 0; font-family: 'Courier New', monospace; font-size: 14px; color: #4CAF50; word-break: break-all;">
                                     {{ token }}
                                 </p>
                             </div>
-                            <!-- Instructions -->
-                            <p style="margin: 30px 0 20px; color: #666666; font-size: 14px; line-height: 1.6;">
-                                Use this token by calling the API endpoint:
-                            </p>
                             <div style="background-color: #f8f9fa; border-left: 4px solid #4CAF50; padding: 15px; margin: 20px 0; font-family: 'Courier New', monospace; font-size: 13px; color: #333333;">
-                                POST {{ api_url }}/api/auth/verify-email<br>
+                                POST {{ api_url }}/api/v1/core/auth/email/verify<br>
                                 { "token": "{{ token }}" }
                             </div>
+                            {% endif %}
                             <p style="margin: 20px 0 0; color: #999999; font-size: 13px; line-height: 1.6;">
                                 This token will expire in {{ email_verification_expire_in_hours }} hours.
                             </p>

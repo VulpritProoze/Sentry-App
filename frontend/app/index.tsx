@@ -1,6 +1,6 @@
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { Home, LogIn, Shield, UserPlus } from "@tamagui/lucide-icons";
-import { useRouter } from "expo-router";
+import { useRouter, Redirect } from "expo-router";
 import React from "react";
 import {
   Button,
@@ -14,7 +14,17 @@ import { useAuth } from "@/context/AuthContext";
 const LandingPage = () => {
   const colors = useThemeColors();
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isInitializing } = useAuth();
+
+  // Redirect authenticated users to home
+  if (!isInitializing && isAuthenticated) {
+    return <Redirect href="/(tabs)/home" />;
+  }
+
+  // Show loading state while checking auth
+  if (isInitializing) {
+    return null; // or a loading spinner
+  }
 
   return (
     <ScrollView style={{ backgroundColor: colors.background }}>
@@ -103,27 +113,6 @@ const LandingPage = () => {
             <UserPlus size={20} color={colors.primary} />
             <Text color={colors.primary} fontWeight="bold" fontSize={"$5"}>
               Register
-            </Text>
-          </Button>
-
-          {/* Temporary Navigation */}
-          <Button
-            backgroundColor={colors.gray[200]}
-            onPress={() => {
-              if (isAuthenticated) {
-                router.push("/(tabs)/home");
-              } else {
-                // Redirect to login if not authenticated
-                router.push("/(auth)/login");
-              }
-            }}
-            size="$4"
-            borderRadius="$4"
-            marginTop={"$4"}
-          >
-            <Home size={20} color={colors.text} />
-            <Text color={colors.text} fontWeight="bold" fontSize={"$5"}>
-              Go to Home (Temporary)
             </Text>
           </Button>
         </YStack>

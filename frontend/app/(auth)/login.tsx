@@ -1,5 +1,5 @@
 import { useThemeColors } from "@/hooks/useThemeColors";
-import { Eye, EyeOff, Lock, Mail, User } from "@tamagui/lucide-icons";
+import { Check, Eye, EyeOff, Lock, Mail, User } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -89,21 +89,10 @@ const login = () => {
       // Determine if input is email or username
       const isEmail = usernameOrEmail.includes("@");
       const credentials = {
-        [isEmail ? "email" : "username"]: usernameOrEmail,
+        email: isEmail ? usernameOrEmail : "",
+        username: isEmail ? "" : usernameOrEmail,
         password,
       };
-
-      // Temporary console logs for testing
-      const baseURL = `${API_URL}/core`;
-      console.log("=== LOGIN SUBMIT DEBUG ===");
-      console.log("Base URL:", baseURL);
-      console.log("Full Login Endpoint:", `${baseURL}/auth/login`);
-      console.log("Credentials:", {
-        [isEmail ? "email" : "username"]: usernameOrEmail,
-        password: "[REDACTED]",
-      });
-      console.log("Remember Me:", rememberMe);
-      console.log("=========================");
 
       // Pass rememberMe to the login function
       await login(credentials, rememberMe);
@@ -237,9 +226,14 @@ const login = () => {
                 <Checkbox
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                  borderColor={colors.border}
+                  borderColor={rememberMe ? colors.primary : colors.border}
+                  backgroundColor={rememberMe ? colors.primary : colors.background}
+                  size="$4"
+                  borderWidth={2}
                 >
-                  <Checkbox.Indicator backgroundColor={colors.primary} />
+                  <Checkbox.Indicator>
+                    {rememberMe && <Check size={16} color="#ffffff" />}
+                  </Checkbox.Indicator>
                 </Checkbox>
                 <Text color={colors.text} fontSize={"$3"}>
                   Remember me

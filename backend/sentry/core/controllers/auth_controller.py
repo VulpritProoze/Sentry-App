@@ -37,8 +37,6 @@ from core.utils.email_utils import send_password_reset_email, send_verification_
 
 User = get_user_model()
 
-logger = logging.getLogger(__name__)
-
 
 def login(
     request: HttpRequest,
@@ -54,8 +52,17 @@ def login(
         A dictionary containing the access token and refresh token
 
     """
-    identifier = credentials.username or credentials.email
+    logger = logging.getLogger("core")
 
+    # Log request body/credentials
+    logger.info("=== LOGIN REQUEST BODY ===")
+    logger.info("Username: '%s'", credentials.username)
+    logger.info("Email: '%s'", credentials.email)
+    logger.info("Password present: %s", bool(credentials.password))
+    logger.info("=========================")
+
+    identifier = credentials.username or credentials.email
+    logger.info("Attempting authentication for identifier: '%s'", identifier)
     if not identifier:
         raise AuthenticationError(
             message=AuthMessages.Login.EITHER_CREDS,

@@ -24,7 +24,8 @@ from .config import settings
 ALLOWED_HOSTS = settings.django_allowed_hosts
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = []
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = settings.django_cors_allowed_origins
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -134,6 +135,14 @@ LOGGING = {
             "backupCount": 5,
             "formatter": "verbose",
         },
+        "core_file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "core.log",
+            "maxBytes": 1024 * 1024 * 10,  # 10 MB
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
     },
     "root": {
         "handlers": ["console"],
@@ -152,6 +161,11 @@ LOGGING = {
         },
         "device": {
             "handlers": ["console", "device_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "core": {
+            "handlers": ["console", "core_file"],
             "level": "INFO",
             "propagate": False,
         },

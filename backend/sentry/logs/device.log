@@ -110,3 +110,4 @@ INFO 2025-12-16 02:23:07 device_controller Device data: None, ax=-0.435702, ay=-
 INFO 2025-12-16 02:23:18 device_controller Device data: None, ax=-0.435847, ay=-0.006022, az=-0.217698, roll=-178.4154, pitch=63.44992, tilt_detected=True
 INFO 2025-12-16 02:23:20 device_controller Device data: None, ax=-0.435233, ay=-0.005066, az=-0.218622, roll=-178.6726, pitch=63.32298, tilt_detected=True
 INFO 2025-12-16 02:23:25 device_controller Device data: None, ax=-0.435768, ay=-0.006452, az=-0.219952, roll=-178.3197, pitch=63.20795, tilt_detected=True
+INFO 2025-12-16 23:08:45 device_controller Device data: string, ax=2.0, ay=3.0, az=1.0, roll=1.0, pitch=1.0, tilt_detected=True

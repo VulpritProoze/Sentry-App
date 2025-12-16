@@ -99,6 +99,10 @@ class Settings(BaseSettings):
         default="http://localhost:8000",
         description="The URL of the API",
     )
+    web_url: str = Field(
+        default="http://localhost:4321",
+        description="The URL of the frontend web application",
+    )
     device_api_key: str | None = Field(
         default=None,
         description="The API key for the device",

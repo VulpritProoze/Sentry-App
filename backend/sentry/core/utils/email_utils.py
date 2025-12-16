@@ -29,8 +29,10 @@ def send_email(
         context = {}
 
     # Add default context
-    context.setdefault("frontend_url", getattr(app_settings, "frontend_url", "http://localhost:3000"))
+    context.setdefault("web_url", getattr(app_settings, "web_url", "http://localhost:4321"))
+    context.setdefault("api_url", getattr(app_settings, "api_url", "http://localhost:8000"))
     context.setdefault("site_name", "Sentry")
+    context.setdefault("debug", settings.DEBUG)
     context.setdefault(
         "email_verification_expire_in_hours",
         getattr(app_settings, "email_verification_expire_in_hours", 24),
@@ -72,8 +74,8 @@ def send_verification_email(user_email: str, token: str, user_name: str = "") ->
         True if email was sent successfully, False otherwise
 
     """
-    frontend_url = getattr(app_settings, "frontend_url", "http://localhost:3000")
-    verification_url = f"{frontend_url}/verify-email?token={token}"
+    web_url = getattr(app_settings, "web_url", "http://localhost:4321")
+    verification_url = f"{web_url}/verify-email?token={token}"
     return send_email(
         subject="Verify Your Email Address",
         recipient_email=user_email,
@@ -98,8 +100,8 @@ def send_password_reset_email(user_email: str, token: str, user_name: str = "") 
         True if email was sent successfully, False otherwise
 
     """
-    frontend_url = getattr(app_settings, "frontend_url", "http://localhost:3000")
-    reset_url = f"{frontend_url}/reset-password?token={token}"
+    web_url = getattr(app_settings, "web_url", "http://localhost:4321")
+    reset_url = f"{web_url}/reset-password?token={token}"
     return send_email(
         subject="Reset Your Password",
         recipient_email=user_email,

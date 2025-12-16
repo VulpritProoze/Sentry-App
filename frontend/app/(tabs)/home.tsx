@@ -5,8 +5,10 @@ import {
   MapPin,
   Send,
   Shield,
+  Mail,
+  RefreshCw,
 } from "@tamagui/lucide-icons";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Card,
@@ -16,15 +18,109 @@ import {
   XStack,
   YStack,
 } from "tamagui";
+import { RefreshControl } from "react-native";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/useToast";
+import { authService } from "@/services/auth.service";
 
 const home = () => {
   const colors = useThemeColors();
-  const { isVerified } = useAuth();
+  const { isVerified, user, refreshUser } = useAuth();
+  const toast = useToast();
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const [isSending, setIsSending] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Cooldown timer effect
+  useEffect(() => {
+    if (cooldownSeconds > 0) {
+      const timer = setTimeout(() => {
+        setCooldownSeconds(cooldownSeconds - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldownSeconds]);
+
+  const handleSendVerificationEmail = async () => {
+    if (!user?.email) {
+      toast.showError("Error", "Email address not found");
+      return;
+    }
+
+    if (cooldownSeconds > 0 || isSending) {
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      await authService.sendVerificationEmail(user.email);
+      toast.showSuccess("Email Sent", "Verification email has been sent to your inbox");
+      setCooldownSeconds(300); // 5 minutes = 300 seconds
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to send verification email";
+      toast.showError("Error", errorMessage);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const formatCooldownTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshUser();
+      toast.showSuccess("Refreshed", "Page data has been updated");
+    } catch (error: any) {
+      const errorMessage = error?.message || "Failed to refresh data";
+      toast.showError("Refresh Failed", errorMessage);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
   
   return (
-    <ScrollView style={{ backgroundColor: colors.background }}>
+    <ScrollView 
+      style={{ backgroundColor: colors.background }}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          tintColor={colors.primary}
+          colors={[colors.primary]}
+        />
+      }
+    >
       <YStack padding={"$4"} gap={"$4"}>
+        {/* Refresh Button */}
+        <XStack justifyContent="flex-end">
+          <Button
+            variant="outlined"
+            borderWidth={1}
+            borderColor={colors.border}
+            backgroundColor={colors.cardBackground}
+            onPress={handleRefresh}
+            disabled={isRefreshing}
+            opacity={isRefreshing ? 0.6 : 1}
+            paddingHorizontal="$3"
+            paddingVertical="$2"
+          >
+            <XStack gap={"$2"} alignItems="center">
+              <RefreshCw 
+                size={16} 
+                color={colors.primary}
+              />
+              <Text color={colors.primary} fontSize={"$3"} fontWeight="500">
+                {isRefreshing ? "Refreshing..." : "Refresh"}
+              </Text>
+            </XStack>
+          </Button>
+        </XStack>
+
         {/* Verification Warning */}
         {!isVerified && (
           <Card
@@ -46,6 +142,28 @@ const home = () => {
             <Text color={colors.text} fontSize={"$4"}>
               You must be verified before you can access all features.
             </Text>
+            <YStack gap={"$2"} marginTop={"$2"}>
+              <Text color={colors.gray[200]} fontSize={"$3"}>
+                Didn't get an email? Send another one
+              </Text>
+              <Button
+                backgroundColor={colors.primary}
+                onPress={handleSendVerificationEmail}
+                disabled={cooldownSeconds > 0 || isSending}
+                opacity={cooldownSeconds > 0 || isSending ? 0.6 : 1}
+              >
+                <XStack gap={"$2"} alignItems="center">
+                  <Mail size={16} color="#ffffff" />
+                  <Text color="#ffffff" fontWeight="semibold">
+                    {isSending
+                      ? "Sending..."
+                      : cooldownSeconds > 0
+                      ? `Resend in ${formatCooldownTime(cooldownSeconds)}`
+                      : "Send Verification Email"}
+                  </Text>
+                </XStack>
+              </Button>
+            </YStack>
           </Card>
         )}
 

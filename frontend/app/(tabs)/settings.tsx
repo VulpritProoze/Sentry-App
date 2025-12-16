@@ -1,9 +1,10 @@
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useToast } from "@/hooks/useToast";
+import { useAuth } from "@/context/AuthContext";
 import { LogOut, Moon, Palette, Settings, Sun } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, ScrollView, Text, XStack, YStack, Button } from "tamagui";
 import { Pressable, StyleSheet } from "react-native";
 import Animated, {
@@ -17,6 +18,8 @@ const settings = () => {
   const { themePreference, toggleTheme, activeTheme } = useThemeContext();
   const toast = useToast();
   const router = useRouter();
+  const { logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const isDark = activeTheme === "dark";
   
   // Animated value for switch position (0 = left, 24 = right)
@@ -37,6 +40,21 @@ const settings = () => {
       transform: [{ translateX: translateX.value }],
     };
   });
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      toast.showSuccess("Logged Out", "You have been successfully logged out");
+      // Navigate to login page
+      router.replace("/(auth)/login");
+    } catch (error: any) {
+      const errorMessage = error?.message || "Failed to logout. Please try again.";
+      toast.showError("Logout Failed", errorMessage);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
   
   return (
     <ScrollView style={{ backgroundColor: colors.background }}>
@@ -189,14 +207,16 @@ const settings = () => {
               </Text>
             </XStack>
             <Button
-              onPress={() => router.push("/")}
+              onPress={handleLogout}
               backgroundColor={colors.red}
               color="white"
               fontWeight="600"
+              disabled={isLoggingOut}
+              opacity={isLoggingOut ? 0.6 : 1}
             >
               <LogOut size={20} color="#ffffff" />
               <Text color="#ffffff" fontWeight="600">
-                Logout
+                {isLoggingOut ? "Logging out..." : "Logout"}
               </Text>
             </Button>
           </YStack>

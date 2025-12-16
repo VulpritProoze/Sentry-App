@@ -11,11 +11,16 @@ import {
   XStack,
   YStack,
 } from "tamagui";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/useToast";
 import zxcvbn from "zxcvbn";
 
 const register = () => {
   const colors = useThemeColors();
   const router = useRouter();
+  const { register } = useAuth();
+  const toast = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -171,7 +176,7 @@ const register = () => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = {
       username: validateUsername(formData.username),
       email: validateEmail(formData.email),
@@ -188,8 +193,28 @@ const register = () => {
       return;
     }
 
-    // TODO: Implement registration logic
-    console.log("Register:", formData);
+    setIsLoading(true);
+    try {
+      await register(
+        {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          middle_name: formData.middle_name || undefined,
+        },
+        true // rememberMe
+      );
+      toast.showSuccess("Success!", "Account created successfully! Please verify your email.");
+      // Navigate to home tab
+      router.replace("/(tabs)/home");
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || "Registration failed. Please try again.";
+      toast.showError("Registration Failed", errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -416,9 +441,11 @@ const register = () => {
               backgroundColor={colors.primary}
               onPress={handleSubmit}
               marginTop={"$2"}
+              disabled={isLoading}
+              opacity={isLoading ? 0.6 : 1}
             >
               <Text color="#ffffff" fontWeight="bold">
-                Register
+                {isLoading ? "Registering..." : "Register"}
               </Text>
             </Button>
 
