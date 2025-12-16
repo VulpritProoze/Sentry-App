@@ -4,6 +4,8 @@
 #include "TiltDetection.h"
 #include "APIKeyStorage.h"
 #include "ServerHandler.h"
+#include "GPSHandler.h"
+
 #include <ArduinoJson.h>
 #include "secrets.h"
 
@@ -20,6 +22,9 @@ void setup() {
   // Initialize MPU6050
   initMPU();
 
+  // Initialize GPS
+  initGPS();
+
   // Server setup
   if (!isAPIKeySet()) {
     setAPIKey(apiKey);
@@ -27,12 +32,15 @@ void setup() {
   setBaseUrl(apiEndpoint);
   
   lastSendTime = millis();
-  Serial.println("Server mode - JSON payloads will be sent to API and printed to Serial");
+  Serial.println("GPS Integration - JSON payloads will be printed to Serial (server sending disabled for GPS testing)");
 }
 
 void loop() {
   // Maintain WiFi connection
   maintainWiFiConnection(ssid, password);
+
+  // Update GPS data
+  updateGPS();
 
   float ax, ay, az;
   readAccel(ax, ay, az);
@@ -55,14 +63,37 @@ void loop() {
   // Build and print JSON payload every SEND_INTERVAL milliseconds
   unsigned long currentTime = millis();
   if (currentTime - lastSendTime >= SEND_INTERVAL) {
-    // Build JSON payload matching API schema (DeviceDataRequest)
-    StaticJsonDocument<256> doc;
+    // Build JSON payload with sensor and GPS data
+    // Increased size to accommodate GPS data
+    StaticJsonDocument<512> doc;
+    
+    // Sensor data
     doc["ax"] = ax;
     doc["ay"] = ay;
     doc["az"] = az;
     doc["roll"] = roll;
     doc["pitch"] = pitch;
     doc["tilt_detected"] = currentTilt;
+    
+    // GPS data (only include if valid)
+    bool gpsFix = hasGPSFix();
+    doc["gps_fix"] = gpsFix;
+    doc["satellites"] = getSatellites();
+    
+    if (isValidLocation()) {
+      doc["latitude"] = getLatitude();
+      doc["longitude"] = getLongitude();
+      float altitude = getAltitude();
+      if (altitude != 0.0) {
+        doc["altitude"] = altitude;
+      }
+    } else {
+      // Set GPS fields to null when no valid fix
+      doc["latitude"] = nullptr;
+      doc["longitude"] = nullptr;
+      doc["altitude"] = nullptr;
+    }
+    
     // Optional: add device_id and timestamp if needed
     // doc["device_id"] = "ESP32_001";
     // doc["timestamp"] = millis();
@@ -70,20 +101,24 @@ void loop() {
     String jsonPayload;
     serializeJson(doc, jsonPayload);
     
-    // Print JSON to Serial for debugging
+    // Print JSON to Serial Monitor (server sending disabled for GPS testing phase)
     Serial.println("--- JSON Payload ---");
     Serial.println(jsonPayload);
     Serial.println("--- End JSON ---");
     
-    // Send data to server
-    if (isWiFiConnected()) {
-      if (postJson("/data", jsonPayload)) {
-        Serial.println("Data sent to /data endpoint");
-      } else {
-        Serial.println("Failed to send data");
+    // GPS status info
+    if (gpsFix) {
+      Serial.print("GPS Fix: YES | Satellites: ");
+      Serial.print(getSatellites());
+      if (isValidLocation()) {
+        Serial.print(" | Lat: ");
+        Serial.print(getLatitude(), 6);
+        Serial.print(", Lon: ");
+        Serial.print(getLongitude(), 6);
       }
+      Serial.println();
     } else {
-      Serial.println("WiFi not connected, skipping data send");
+      Serial.println("GPS Fix: NO - Waiting for satellite lock...");
     }
     
     lastSendTime = currentTime;
