@@ -4,10 +4,12 @@ import { CheckCircle, XCircle, Info, AlertTriangle, X } from '@tamagui/lucide-ic
 import { useToast } from '@/context/ToastContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const ToastContainer = () => {
   const { toasts, hideToast } = useToast();
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
 
   const getIcon = (type: string) => {
     const iconSize = 20;
@@ -41,7 +43,7 @@ export const ToastContainer = () => {
   return (
     <YStack
       position="absolute"
-      top="$2"
+      top={insets.top + 8}
       left="$4"
       right="$4"
       zIndex={9999}

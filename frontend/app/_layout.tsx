@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { TamaguiProvider } from "tamagui";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { queryClient } from "../lib/queryClient";
 import { AuthProvider } from "../context/AuthContext";
 import { ThemeProvider, useThemeContext } from "../context/ThemeContext";
@@ -27,9 +28,11 @@ export default function Layout() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <ThemedApp />
-          </GestureHandlerRootView>
+          <SafeAreaProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <ThemedApp />
+            </GestureHandlerRootView>
+          </SafeAreaProvider>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
