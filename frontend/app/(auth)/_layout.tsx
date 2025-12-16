@@ -12,7 +12,6 @@ const AuthLayout = () => {
         headerStyle: { backgroundColor: colors.green[400] },
         headerTintColor: "#ffffff",
         headerTitleAlign: "center",
-        headerBackTitleVisible: false,
       }}
     >
       <Stack.Screen

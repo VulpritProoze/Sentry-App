@@ -972,3 +972,100 @@ WARNING 2025-12-17 01:35:27 log "POST /api/v1/core/auth/email/reset-password HTT
 WARNING 2025-12-17 01:36:46 log "POST /api/v1/core/auth/email/reset-password HTTP/1.1" 422 82
 INFO 2025-12-17 01:37:06 log "POST /api/v1/core/auth/email/reset-password HTTP/1.1" 200 43
 WARNING 2025-12-17 01:37:14 log "POST /api/v1/core/auth/email/reset-password HTTP/1.1" 404 112
+INFO 2025-12-17 01:39:24 log "POST /api/v1/core/auth/login HTTP/1.1" 200 432
+INFO 2025-12-17 01:39:25 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 57
+INFO 2025-12-17 01:39:26 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 347
+INFO 2025-12-17 01:40:06 log "POST /api/v1/core/auth/email/send-verification-email HTTP/1.1" 200 41
+INFO 2025-12-17 01:41:11 log "POST /api/v1/core/auth/login HTTP/1.1" 200 450
+INFO 2025-12-17 01:41:13 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:41:14 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:47:05 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:47:05 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:47:05 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:47:05 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:49:49 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:49:49 basehttp - Broken pipe from ('192.168.254.102', 48844)
+INFO 2025-12-17 01:49:50 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:50:08 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:50:09 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:54:20 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:54:21 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:55:23 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:55:23 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:55:27 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:55:27 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:55:27 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:55:28 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:55:30 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:55:31 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:56:49 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:58:32 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:58:33 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:58:44 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 01:59:29 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 01:59:29 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 02:00:10 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 02:00:57 autoreload D:\User Folder\Magus Files\RRA Personal Folder\HelloWorld\React Native\Sentry\Sentry-App\backend\sentry\core\controllers\auth_controller.py changed, reloading.
+INFO 2025-12-17 02:01:07 autoreload Watching for file changes with StatReloader
+INFO 2025-12-17 02:01:15 autoreload D:\User Folder\Magus Files\RRA Personal Folder\HelloWorld\React Native\Sentry\Sentry-App\backend\sentry\core\controllers\auth_controller.py changed, reloading.
+INFO 2025-12-17 02:01:17 autoreload Watching for file changes with StatReloader
+INFO 2025-12-17 02:06:59 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 02:07:57 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 02:07:59 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 02:08:08 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 02:13:04 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 02:13:06 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+INFO 2025-12-17 02:13:19 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 357
+WARNING 2025-12-17 02:13:57 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
+INFO 2025-12-17 02:14:11 log "POST /api/v1/core/auth/login HTTP/1.1" 200 432
+INFO 2025-12-17 02:14:12 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 57
+INFO 2025-12-17 02:14:13 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 369
+WARNING 2025-12-17 02:15:59 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
+WARNING 2025-12-17 02:16:34 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
+WARNING 2025-12-17 02:16:44 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
+INFO 2025-12-17 02:17:04 autoreload D:\User Folder\Magus Files\RRA Personal Folder\HelloWorld\React Native\Sentry\Sentry-App\backend\sentry\core\controllers\auth_controller.py changed, reloading.
+INFO 2025-12-17 02:17:14 autoreload Watching for file changes with StatReloader
+WARNING 2025-12-17 02:19:47 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
+WARNING 2025-12-17 02:23:34 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
+WARNING 2025-12-17 02:23:43 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
+INFO 2025-12-17 02:24:56 log "POST /api/v1/core/auth/register HTTP/1.1" 200 449
+INFO 2025-12-17 02:24:57 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 57
+INFO 2025-12-17 02:24:57 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 350
+INFO 2025-12-17 02:25:23 log "POST /api/v1/core/auth/login HTTP/1.1" 200 450
+INFO 2025-12-17 02:25:24 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 02:25:25 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 379
+INFO 2025-12-17 02:26:10 log "PUT /api/v1/core/user/me/profile-picture/update HTTP/1.1" 200 51
+INFO 2025-12-17 02:26:12 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+WARNING 2025-12-17 02:26:13 log "GET /media/user/images/profile_pictures/profile.jpg HTTP/1.1" 404 2317
+INFO 2025-12-17 02:26:14 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+INFO 2025-12-17 02:26:15 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 02:26:16 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+INFO 2025-12-17 02:26:22 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+INFO 2025-12-17 02:30:00 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+WARNING 2025-12-17 02:30:43 log "GET /media/user/images/profile_pictures/profile.jpg HTTP/1.1" 404 2317
+INFO 2025-12-17 02:31:09 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 02:31:10 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+INFO 2025-12-17 02:31:34 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+WARNING 2025-12-17 02:31:35 log "GET /media/user/images/profile_pictures/profile.jpg HTTP/1.1" 404 2317
+WARNING 2025-12-17 02:33:36 log "GET /media/user/images/profile_pictures/profile.jpg HTTP/1.1" 404 2317
+WARNING 2025-12-17 02:34:13 log "GET /media/user/images/profile_pictures/profile.jpg HTTP/1.1" 404 2317
+INFO 2025-12-17 02:34:27 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+INFO 2025-12-17 02:34:52 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 02:34:53 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+INFO 2025-12-17 02:38:02 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+WARNING 2025-12-17 02:38:02 log "GET /media/user/images/profile_pictures/profile.jpg HTTP/1.1" 404 2317
+INFO 2025-12-17 02:38:51 autoreload D:\User Folder\Magus Files\RRA Personal Folder\HelloWorld\React Native\Sentry\Sentry-App\backend\sentry\sentry\urls.py changed, reloading.
+INFO 2025-12-17 02:39:04 autoreload Watching for file changes with StatReloader
+INFO 2025-12-17 02:39:11 log "GET /media/user/images/profile_pictures/profile.jpg HTTP/1.1" 200 227879
+INFO 2025-12-17 02:39:21 autoreload D:\User Folder\Magus Files\RRA Personal Folder\HelloWorld\React Native\Sentry\Sentry-App\backend\sentry\sentry\urls.py changed, reloading.
+INFO 2025-12-17 02:39:27 autoreload Watching for file changes with StatReloader
+INFO 2025-12-17 02:40:30 log "PUT /api/v1/core/user/me/update HTTP/1.1" 200 52
+INFO 2025-12-17 02:40:32 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 434
+INFO 2025-12-17 02:40:33 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 434
+INFO 2025-12-17 02:40:34 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 02:40:35 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 434
+INFO 2025-12-17 02:40:47 log "PUT /api/v1/core/user/me/update HTTP/1.1" 200 52
+INFO 2025-12-17 02:40:48 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+INFO 2025-12-17 02:40:49 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424
+INFO 2025-12-17 02:40:50 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 52
+INFO 2025-12-17 02:40:51 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 424

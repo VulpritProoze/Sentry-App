@@ -15,6 +15,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/useToast";
 import { API_URL } from "@/lib/api";
+import { extractErrorMessage } from "@/lib/errorUtils";
 
 const login = () => {
   const colors = useThemeColors();
@@ -100,7 +101,7 @@ const login = () => {
       // Navigate to home tab
       router.replace("/(tabs)/home");
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || error?.message || "Login failed. Please try again.";
+      const errorMessage = extractErrorMessage(error);
       toast.showError("Login Failed", errorMessage);
     } finally {
       setIsLoading(false);

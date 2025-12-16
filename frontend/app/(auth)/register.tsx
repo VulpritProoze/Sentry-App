@@ -13,6 +13,7 @@ import {
 } from "tamagui";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/useToast";
+import { extractErrorMessage } from "@/lib/errorUtils";
 import zxcvbn from "zxcvbn";
 
 const register = () => {
@@ -210,7 +211,7 @@ const register = () => {
       // Navigate to home tab
       router.replace("/(tabs)/home");
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || error?.message || "Registration failed. Please try again.";
+      const errorMessage = extractErrorMessage(error);
       toast.showError("Registration Failed", errorMessage);
     } finally {
       setIsLoading(false);

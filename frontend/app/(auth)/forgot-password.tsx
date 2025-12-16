@@ -12,6 +12,7 @@ import {
   YStack,
 } from "tamagui";
 import { useToast } from "@/hooks/useToast";
+import { extractErrorMessage } from "@/lib/errorUtils";
 import { authService } from "@/services/auth.service";
 
 const ForgotPassword = () => {
@@ -63,10 +64,7 @@ const ForgotPassword = () => {
       setIsSubmitted(true);
       toast.showSuccess("Email Sent!", "Please check your email for password reset instructions.");
     } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to send reset email. Please try again.";
+      const errorMessage = extractErrorMessage(error);
       toast.showError("Error", errorMessage);
     } finally {
       setIsLoading(false);

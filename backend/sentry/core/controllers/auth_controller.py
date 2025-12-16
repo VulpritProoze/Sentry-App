@@ -92,6 +92,9 @@ def login(
             message=AuthMessages.Login.INACTIVE_USER,
         )
 
+    # Update last login timestamp
+    User.objects.filter(id=user.id).update(last_login=datetime.now(UTC))
+
     user_schema = UserSchema.model_validate(user)
     try:
         tokens = create_token_pair(user_schema)

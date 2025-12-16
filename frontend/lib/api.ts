@@ -3,7 +3,8 @@ import { getStoredRefreshToken, getStoredToken, storeTokens, clearStoredTokens }
 
 // Base API URL from environment
 // In Expo, environment variables must be prefixed with EXPO_PUBLIC_ to be accessible in client code
-export const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/api/v1` || 'http://localhost:8000/api/v1';
+const BASE_API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+export const API_URL = `${BASE_API_URL}/api/v1`;
 
 // Logout callback for handling refresh failures
 let logoutCallback: (() => void) | null = null;
@@ -86,7 +87,7 @@ coreApi.interceptors.response.use(
         // Retry original request with new token
         originalRequest.headers.Authorization = `Bearer ${response.data.access_token}`;
         return coreApi(originalRequest);
-      } catch (refreshError) {
+      } catch (refreshError: any) {
         // Refresh failed, logout user
         await clearStoredTokens();
         if (logoutCallback) {

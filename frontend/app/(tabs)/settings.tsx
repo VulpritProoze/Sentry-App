@@ -2,7 +2,7 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useToast } from "@/hooks/useToast";
 import { useAuth } from "@/context/AuthContext";
-import { LogOut, Moon, Palette, Settings, Sun } from "@tamagui/lucide-icons";
+import { LogOut, Moon, Palette, Settings, Sun, User } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Card, ScrollView, Text, XStack, YStack, Button } from "tamagui";
@@ -59,6 +59,41 @@ const settings = () => {
   return (
     <ScrollView style={{ backgroundColor: colors.background }}>
       <YStack padding={"$4"} gap={"$4"}>
+        {/* Profile Card - Topmost */}
+        <Card
+          elevate
+          bordered
+          animation="bouncy"
+          borderColor={colors.border}
+          padded
+          gap={"$4"}
+          enterStyle={{ opacity: 0, y: 10 }}
+          opacity={1}
+          y={0}
+          backgroundColor={colors.cardBackground}
+        >
+          <YStack gap={"$4"}>
+            <XStack alignItems="center" gap={"$2"}>
+              <User color={colors.primary} />
+              <Text color={colors.text} fontSize={"$5"} fontWeight={"500"}>
+                Profile
+              </Text>
+            </XStack>
+            <Button
+              onPress={() => router.push("/(app)/profile")}
+              backgroundColor={colors.primary}
+              color="white"
+              fontWeight="600"
+            >
+              <User size={20} color="#ffffff" />
+              <Text color="#ffffff" fontWeight="600" marginLeft="$2">
+                View Profile
+              </Text>
+            </Button>
+          </YStack>
+        </Card>
+
+        {/* App Settings Card - Contains Theme and Account */}
         <Card
           elevate
           bordered
@@ -78,147 +113,74 @@ const settings = () => {
                 App Settings
               </Text>
             </XStack>
-          </YStack>
-        </Card>
 
-        <Card
-          elevate
-          bordered
-          animation="bouncy"
-          borderColor={colors.border}
-          padded
-          gap={"$4"}
-          enterStyle={{ opacity: 0, y: 10 }}
-          opacity={1}
-          y={0}
-          backgroundColor={colors.cardBackground}
-        >
-          <YStack gap={"$4"}>
-            <XStack alignItems="center" justifyContent="space-between">
-              <XStack alignItems="center" gap={"$3"} flex={1}>
-                <Palette color={colors.primary} size={20} />
-                <YStack flex={1}>
-                  <Text color={colors.text} fontSize={"$5"} fontWeight={"500"}>
-                    Theme
-                  </Text>
-                  <Text color={colors.gray[200]} fontSize={"$3"}>
-                    {themePreference === "system"
-                      ? "System Default"
-                      : isDark
-                      ? "Dark Mode"
-                      : "Light Mode"}
-                  </Text>
-                </YStack>
+            {/* Theme Section */}
+            <YStack gap={"$3"} paddingTop={"$2"}>
+              <XStack alignItems="center" justifyContent="space-between">
+                <XStack alignItems="center" gap={"$3"} flex={1}>
+                  <Palette color={colors.primary} size={20} />
+                  <YStack flex={1}>
+                    <Text color={colors.text} fontSize={"$5"} fontWeight={"500"}>
+                      Theme
+                    </Text>
+                    <Text color={colors.gray[200]} fontSize={"$3"}>
+                      {themePreference === "system"
+                        ? "System Default"
+                        : isDark
+                        ? "Dark Mode"
+                        : "Light Mode"}
+                    </Text>
+                  </YStack>
+                </XStack>
+                <Pressable
+                  onPress={toggleTheme}
+                  style={[
+                    styles.switchContainer,
+                    {
+                      backgroundColor: isDark ? colors.primary : colors.gray[200],
+                    },
+                  ]}
+                >
+                  <Animated.View style={[styles.switchThumb, animatedThumbStyle]}>
+                    {isDark ? (
+                      <Moon size={14} color={colors.primary} />
+                    ) : (
+                      <Sun size={14} color="#FFA500" />
+                    )}
+                  </Animated.View>
+                </Pressable>
               </XStack>
-              <Pressable
-                onPress={toggleTheme}
-                style={[
-                  styles.switchContainer,
-                  {
-                    backgroundColor: isDark ? colors.primary : colors.gray[200],
-                  },
-                ]}
-              >
-                <Animated.View style={[styles.switchThumb, animatedThumbStyle]}>
-                  {isDark ? (
-                    <Moon size={14} color={colors.primary} />
-                  ) : (
-                    <Sun size={14} color="#FFA500" />
-                  )}
-                </Animated.View>
-              </Pressable>
-            </XStack>
-          </YStack>
-        </Card>
+            </YStack>
 
-        <Card
-          elevate
-          bordered
-          animation="bouncy"
-          borderColor={colors.border}
-          padded
-          gap={"$4"}
-          enterStyle={{ opacity: 0, y: 10 }}
-          opacity={1}
-          y={0}
-          backgroundColor={colors.cardBackground}
-        >
-          <YStack gap={"$4"}>
-            <XStack alignItems="center" gap={"$2"}>
-              <Settings color={colors.primary} />
-              <Text color={colors.text} fontSize={"$5"} fontWeight={"500"}>
-                Test Toast Notifications
-              </Text>
-            </XStack>
+            {/* Divider */}
+            <XStack
+              height={1}
+              backgroundColor={colors.border}
+              marginVertical={"$2"}
+            />
+
+            {/* Account Section */}
             <YStack gap={"$3"}>
+              <XStack alignItems="center" gap={"$2"}>
+                <LogOut color={colors.red} size={20} />
+                <Text color={colors.text} fontSize={"$5"} fontWeight={"500"}>
+                  Account
+                </Text>
+              </XStack>
               <Button
-                onPress={() => toast.showSuccess("Success!", "Operation completed successfully")}
-                backgroundColor={colors.green?.[500] || colors.primary}
-                color="white"
-                fontWeight="600"
-              >
-                Show Success Toast
-              </Button>
-              <Button
-                onPress={() => toast.showError("Error!", "Something went wrong")}
+                onPress={handleLogout}
                 backgroundColor={colors.red}
                 color="white"
                 fontWeight="600"
+                disabled={isLoggingOut}
+                opacity={isLoggingOut ? 0.6 : 1}
               >
-                Show Error Toast
-              </Button>
-              <Button
-                onPress={() => toast.showInfo("Information", "Here is some useful information")}
-                backgroundColor={colors.primary}
-                color="white"
-                fontWeight="600"
-              >
-                Show Info Toast
-              </Button>
-              <Button
-                onPress={() => toast.showWarning("Warning!", "Please be careful")}
-                backgroundColor="#eab308"
-                color="white"
-                fontWeight="600"
-              >
-                Show Warning Toast
+                <LogOut size={20} color="#ffffff" />
+                <Text color="#ffffff" fontWeight="600">
+                  {isLoggingOut ? "Logging out..." : "Logout"}
+                </Text>
               </Button>
             </YStack>
-          </YStack>
-        </Card>
-
-        <Card
-          elevate
-          bordered
-          animation="bouncy"
-          borderColor={colors.border}
-          padded
-          gap={"$4"}
-          enterStyle={{ opacity: 0, y: 10 }}
-          opacity={1}
-          y={0}
-          backgroundColor={colors.cardBackground}
-        >
-          <YStack gap={"$4"}>
-            <XStack alignItems="center" gap={"$2"}>
-              <LogOut color={colors.red} />
-              <Text color={colors.text} fontSize={"$5"} fontWeight={"500"}>
-                Account
-              </Text>
-            </XStack>
-            <Button
-              onPress={handleLogout}
-              backgroundColor={colors.red}
-              color="white"
-              fontWeight="600"
-              disabled={isLoggingOut}
-              opacity={isLoggingOut ? 0.6 : 1}
-            >
-              <LogOut size={20} color="#ffffff" />
-              <Text color="#ffffff" fontWeight="600">
-                {isLoggingOut ? "Logging out..." : "Logout"}
-              </Text>
-            </Button>
           </YStack>
         </Card>
       </YStack>
