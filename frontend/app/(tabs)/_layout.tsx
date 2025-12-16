@@ -1,17 +1,23 @@
-import { Colors } from "@/constants/colors";
 import { History, Home, Settings, Users } from "@tamagui/lucide-icons";
 import { Tabs } from "expo-router";
 import React from "react";
+import { useThemeColors } from "@/hooks/useThemeColors";
+
 const _layout = () => {
+  const colors = useThemeColors();
+  
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.green[500],
-        tabBarInactiveTintColor: Colors.gray[200],
-        headerStyle: { backgroundColor: Colors.green[400] },
-        headerTintColor: "#ffffffff",
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.gray[200],
+        headerStyle: { backgroundColor: colors.green[400] },
+        headerTintColor: "#ffffff",
+        tabBarStyle: {
+          backgroundColor: colors.background,
+        },
         sceneStyle: {
-          backgroundColor: Colors.green[100],
+          backgroundColor: colors.background,
         },
       }}
     >

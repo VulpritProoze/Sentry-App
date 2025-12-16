@@ -1,16 +1,37 @@
 import { Stack } from "expo-router";
-import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { TamaguiProvider } from "tamagui";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "../lib/queryClient";
+import { AuthProvider } from "../context/AuthContext";
+import { ThemeProvider, useThemeContext } from "../context/ThemeContext";
+import { ToastProvider } from "../context/ToastContext";
+import { ToastContainer } from "../components/ToastContainer";
 import config from "../tamagui.config";
 
-export default function Layout() {
-  const colorScheme = useColorScheme();
+function ThemedApp() {
+  const { activeTheme } = useThemeContext();
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <TamaguiProvider config={config} defaultTheme={colorScheme!}>
+    <TamaguiProvider config={config} defaultTheme={activeTheme}>
+      <ToastProvider>
         <Stack screenOptions={{ headerShown: false }} />
-      </TamaguiProvider>
-    </GestureHandlerRootView>
+        <ToastContainer />
+      </ToastProvider>
+    </TamaguiProvider>
+  );
+}
+
+export default function Layout() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ThemeProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <ThemedApp />
+          </GestureHandlerRootView>
+        </ThemeProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

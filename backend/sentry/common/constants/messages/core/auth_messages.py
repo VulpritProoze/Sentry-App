@@ -38,6 +38,7 @@ class AuthMessages:
         USER_NOT_FOUND: Final[str] = "User not found from the token payload."
         INVALID_TOKEN: Final[str] = "Invalid token. Either the token is expired or invalid."  # noqa: S105
         INACTIVE_USER: Final[str] = "User is inactive. Please contact support."
+        UNVERIFIED_USER: Final[str] = "User is not verified. Please verify your email to access this resource."
 
     class EmailVerification:
         """Email verification messages."""

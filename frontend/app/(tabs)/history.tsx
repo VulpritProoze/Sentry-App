@@ -1,31 +1,34 @@
-import { Colors } from "@/constants/colors";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { Activity, CheckCircle } from "@tamagui/lucide-icons";
 import React from "react";
 import { Card, ScrollView, Square, Text, XStack, YStack } from "tamagui";
 const history = () => {
+  const colors = useThemeColors();
+  
   return (
-    <ScrollView>
+    <ScrollView style={{ backgroundColor: colors.background }}>
       <YStack padding={"$4"}>
         <Card
           elevate
           bordered
           animation={"bouncy"}
-          borderColor={Colors.green[200]}
+          borderColor={colors.border}
           padded
           gap={"$4"}
           enterStyle={{ opacity: 0, y: 10 }}
+          backgroundColor={colors.cardBackground}
         >
           <YStack gap={"$4"}>
             <XStack alignItems="center" gap={"$2"}>
-              <Activity color={Colors.green[500]} />
-              <Text>Alert History</Text>
+              <Activity color={colors.primary} />
+              <Text color={colors.text}>Alert History</Text>
             </XStack>
-            <Card padded borderColor={Colors.gray[200]} bordered>
+            <Card padded borderColor={colors.border} bordered backgroundColor={colors.cardBackground}>
               <XStack gap={"$2"} alignItems="center">
-                <CheckCircle color={Colors.gray[100]} />
-                <Text>False Alarm</Text>
-                <Square backgroundColor="#cec5c5ff" padding={"$1"} radiused>
-                  <Text>Cancelled</Text>
+                <CheckCircle color={colors.gray[100]} />
+                <Text color={colors.text}>False Alarm</Text>
+                <Square backgroundColor={colors.gray[100]} padding={"$1"} radiused>
+                  <Text color={colors.text}>Cancelled</Text>
                 </Square>
               </XStack>
             </Card>

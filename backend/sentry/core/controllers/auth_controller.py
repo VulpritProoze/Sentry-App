@@ -242,35 +242,43 @@ def refresh_token(
         ) from None
 
 
-def get_current_user(request: HttpRequest) -> dict[str, Any]:  # noqa: ARG001
-    """Get current authenticated user.
+def is_user_authenticated(request: HttpRequest) -> dict[str, Any]:
+    """Check if user is authenticated.
 
     Args:
         request: The HTTP request object
-        user: The authenticated user from JWT token (injected by Django Ninja)
 
     Returns:
-        UserSchema of the current authenticated user
+        A dictionary containing the message
 
     """
+    if not request.user:  # pyright: ignore[reportAttributeAccessIssue]
+        raise AuthenticationError(
+            message="User is not authenticated",
+        )
     return {
         "message": "User is currently authenticated",
     }
 
 
-def is_user_verified(user_id: int) -> IsUserVerifiedResponse:
-    """Check if user is verified."""
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        raise HttpError(
-            status_code=404,
-            message="User not found.",
-        ) from None
-    message = "User is verified" if user.is_verified else "User is not verified"
+def is_user_verified(request: HttpRequest) -> IsUserVerifiedResponse:
+    """Check if user is verified.
+
+    Args:
+        request: The HTTP request object
+
+    Returns:
+        IsUserVerifiedResponse containing the message
+
+    """
+    if not request.user:  # pyright: ignore[reportAttributeAccessIssue]
+        return IsUserVerifiedResponse(
+            is_verified=False,
+            message="User is not authenticated",
+        )
     return IsUserVerifiedResponse(
-        is_verified=user.is_verified,
-        message=message,
+        is_verified=request.user.is_verified,  # pyright: ignore[reportAttributeAccessIssue]
+        message="User is verified" if request.user.is_verified else "User is not verified",  # pyright: ignore[reportAttributeAccessIssue]
     )
 
 
@@ -378,7 +386,7 @@ def forgot_password_controller(
 
     """
     try:
-        user = User.objects.get(email=data.email, is_verified=True)
+        user = User.objects.get(email=data.email, is_active=True)
     except User.DoesNotExist:
         # Don't reveal if email exists or not for security
         return MessageResponse(message=AuthMessages.PasswordReset.EMAIL_SENT)

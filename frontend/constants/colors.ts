@@ -30,4 +30,37 @@ export const Colors = {
   red: "#dc2626",
 } as const;
 
+// Dark theme colors
+export const DarkColors = {
+  // Primary Green Colors (Main Theme) - adjusted for dark mode
+  green: {
+    50: "#0a1f0f", // Very dark green background, page backgrounds
+    100: "#14532d", // Dark green background, card backgrounds
+    200: "#15803d", // Card borders, dividers
+    300: "#16a34a", // Button borders, hover borders
+    400: "#22c55e", // Header gradient start
+    500: "#4ade80", // Primary brand color, icons, active navigation, badges, buttons
+    600: "#86efac", // Button hover states, emphasized text
+    700: "#bbf7d0", // Light green text in dark backgrounds
+    800: "#dcfce7", // Lighter text in green info cards
+  },
+
+  // Emerald Colors (Secondary Accent)
+  emerald: {
+    200: "#065f46", // Dark map background gradient
+    500: "#10b981", // Header gradient end
+  },
+
+  // Semantic color mappings for dark theme
+  primary: "#4ade80", // green-400 (lighter for dark mode)
+  primaryHover: "#86efac", // green-300
+  background: "#0a1f0f", // green-50 (dark)
+  cardBackground: "#14532d", // green-100 (dark)
+  border: "#15803d", // green-200 (dark)
+  borderHover: "#16a34a", // green-300 (dark)
+
+  gray: { 100: "#9ca3af", 200: "#d1d5db" }, // Lighter grays for dark mode
+  red: "#ef4444", // Brighter red for dark mode
+} as const;
+
 export type ColorKey = keyof typeof Colors;

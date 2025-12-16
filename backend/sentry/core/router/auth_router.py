@@ -8,7 +8,7 @@ from ninja import Router
 from core.auth.jwt import JwtAuth
 from core.controllers.auth_controller import (
     forgot_password_controller,
-    get_current_user,
+    is_user_authenticated,
     is_user_verified,
     login,
     refresh_token,
@@ -61,11 +61,11 @@ def refresh_token_endpoint(
 
 
 @auth_router.get("/me", auth=JwtAuth())
-def current_user_endpoint(
+def is_user_authenticated_endpoint(
     request: HttpRequest,
 ) -> dict[str, Any]:
-    """Get current authenticated user."""
-    return get_current_user(request)
+    """Check if user is authenticated."""
+    return is_user_authenticated(request)
 
 
 @auth_router.get("/me/is-verified", response=IsUserVerifiedResponse, auth=JwtAuth())
@@ -73,7 +73,7 @@ def is_user_verified_endpoint(
     request: HttpRequest,
 ) -> IsUserVerifiedResponse:
     """Check if user is verified."""
-    return is_user_verified(request.user.id)  # pyright: ignore[reportAttributeAccessIssue]
+    return is_user_verified(request)  # pyright: ignore[reportAttributeAccessIssue]
 
 
 @auth_router.post("/email/send-verification-email", response=MessageResponse)

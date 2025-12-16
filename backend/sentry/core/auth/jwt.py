@@ -57,6 +57,41 @@ class JwtAuth(HttpBearer):
         return user_id
 
 
+class VerifiedJwtAuth(JwtAuth):
+    """JWT authentication that requires verified users only.
+
+    This authentication class extends JwtAuth and adds an additional check
+    to ensure the user's email is verified (is_verified=True) before
+    allowing access to protected routes.
+    """
+
+    def authenticate(self, request: HttpRequest, token: str) -> int | None:
+        """Authenticate the user and verify they are verified.
+
+        Args:
+            request: The HTTP request object
+            token: The JWT token string
+
+        Returns:
+            User ID if authentication and verification succeed
+
+        Raises:
+            AuthenticationError: If user is not verified or authentication fails
+
+        """
+        # First, perform standard JWT authentication
+        user_id = super().authenticate(request, token)
+
+        # Check if user is verified
+        user = request.user  # pyright: ignore[reportAttributeAccessIssue]
+        if not user.is_verified:
+            raise AuthenticationError(
+                message=AuthMessages.JwtAuth.UNVERIFIED_USER,
+            )
+
+        return user_id
+
+
 def decode_jwt_token(token: str) -> dict:
     """Decode the JWT token.
 

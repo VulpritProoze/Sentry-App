@@ -8,147 +8,147 @@ This document outlines the plan for integrating backend API endpoints with the R
 ## Implementation Checklist
 
 ### Phase 1: Setup and Configuration
-- [ ] Create `/frontend/lib` folder
-- [ ] Create `/frontend/services` folder
-- [ ] Create `/frontend/context` folder
-- [ ] Create `/frontend/hooks` folder
+- [x] Create `/frontend/lib` folder
+- [x] Create `/frontend/services` folder
+- [x] Create `/frontend/context` folder
+- [x] Create `/frontend/hooks` folder
 - [x] Install `axios`: `npm install axios` (already installed)
 - [x] Install `@tanstack/react-query`: `npm install @tanstack/react-query` (already installed)
 - [x] Install `expo-secure-store`: `npx expo install expo-secure-store` (already installed)
-- [ ] Create `/frontend/lib/storage.ts` with:
-  - [ ] Import `expo-secure-store`
-  - [ ] Define token key constants
-  - [ ] Implement `storeTokens()` function
-  - [ ] Implement `getStoredToken()` function
-  - [ ] Implement `getStoredRefreshToken()` function
-  - [ ] Implement `clearStoredTokens()` function
-  - [ ] Add error handling to all functions
+- [x] Create `/frontend/lib/storage.ts` with:
+  - [x] Import `expo-secure-store`
+  - [x] Define token key constants
+  - [x] Implement `storeTokens()` function
+  - [x] Implement `getStoredToken()` function
+  - [x] Implement `getStoredRefreshToken()` function
+  - [x] Implement `clearStoredTokens()` function
+  - [x] Add error handling to all functions
 
 ### Phase 2: API Client Setup
-- [ ] Create `/frontend/lib/api.ts` with:
-  - [ ] Import `axios`
-  - [ ] Import storage functions from `./storage`
-  - [ ] Set up `API_URL` from environment variable
-  - [ ] Create `coreApi` axios instance with base URL `${API_URL}/core`
-  - [ ] Create `deviceApi` axios instance with base URL `${API_URL}/device`
-  - [ ] Add request interceptor to `coreApi`:
-    - [ ] Skip token for `/auth/login`, `/auth/register`, `/auth/logout`
-    - [ ] Add `Authorization: Bearer {token}` header for other requests
-    - [ ] Handle async token retrieval
-  - [ ] Add response interceptor to `coreApi`:
-    - [ ] Handle 401 errors
-    - [ ] Skip refresh for login/register/logout/refresh endpoints
-    - [ ] Call `/auth/refresh` endpoint on 401
-    - [ ] Store new tokens after refresh
-    - [ ] Retry original request with new token
-    - [ ] Handle refresh failure (clear tokens, logout)
-  - [ ] Export `coreApi` and `deviceApi`
+- [x] Create `/frontend/lib/api.ts` with:
+  - [x] Import `axios`
+  - [x] Import storage functions from `./storage`
+  - [x] Set up `API_URL` from environment variable
+  - [x] Create `coreApi` axios instance with base URL `${API_URL}/core`
+  - [x] Create `deviceApi` axios instance with base URL `${API_URL}/device`
+  - [x] Add request interceptor to `coreApi`:
+    - [x] Skip token for `/auth/login`, `/auth/register`, `/auth/logout`
+    - [x] Add `Authorization: Bearer {token}` header for other requests
+    - [x] Handle async token retrieval
+  - [x] Add response interceptor to `coreApi`:
+    - [x] Handle 401 errors
+    - [x] Skip refresh for login/register/logout/refresh endpoints
+    - [x] Call `/auth/refresh` endpoint on 401
+    - [x] Store new tokens after refresh
+    - [x] Retry original request with new token
+    - [x] Handle refresh failure (clear tokens, logout)
+  - [x] Export `coreApi` and `deviceApi`
 
 ### Phase 3: Service Layer
-- [ ] Create `/frontend/services/auth.service.ts`:
-  - [ ] Import `coreApi` from `../lib/api`
-  - [ ] Define `LoginRequest` interface
-  - [ ] Define `RegisterRequest` interface
-  - [ ] Define `LoginResponse` interface
-  - [ ] Define `RefreshTokenRequest` interface
-  - [ ] Implement `authService.login()`
-  - [ ] Implement `authService.register()`
-  - [ ] Implement `authService.refreshToken()`
-  - [ ] Implement `authService.getCurrentUser()`
-  - [ ] Implement `authService.isUserVerified()`
-  - [ ] Implement `authService.sendVerificationEmail()`
-  - [ ] Implement `authService.verifyEmail()`
-  - [ ] Implement `authService.forgotPassword()`
-  - [ ] Implement `authService.resetPassword()`
+- [x] Create `/frontend/services/auth.service.ts`:
+  - [x] Import `coreApi` from `../lib/api`
+  - [x] Define `LoginRequest` interface
+  - [x] Define `RegisterRequest` interface
+  - [x] Define `LoginResponse` interface
+  - [x] Define `RefreshTokenRequest` interface
+  - [x] Implement `authService.login()`
+  - [x] Implement `authService.register()`
+  - [x] Implement `authService.refreshToken()`
+  - [x] Implement `authService.getCurrentUser()`
+  - [x] Implement `authService.isUserVerified()`
+  - [x] Implement `authService.sendVerificationEmail()`
+  - [x] Implement `authService.verifyEmail()`
+  - [x] Implement `authService.forgotPassword()`
+  - [x] Implement `authService.resetPassword()`
 
-- [ ] Create `/frontend/services/user.service.ts`:
-  - [ ] Import `coreApi` from `../lib/api`
-  - [ ] Define `User` interface
-  - [ ] Define `LovedOne` interface
-  - [ ] Define `LovedOneListResponse` interface
-  - [ ] Define `UserUpdateRequest` interface
-  - [ ] Implement `userService.getUserInfo()`
-  - [ ] Implement `userService.updateUserInfo()`
-  - [ ] Implement `userService.updateProfilePicture()` with FormData
+- [x] Create `/frontend/services/user.service.ts`:
+  - [x] Import `coreApi` from `../lib/api`
+  - [x] Define `User` interface
+  - [x] Define `LovedOne` interface
+  - [x] Define `LovedOneListResponse` interface
+  - [x] Define `UserUpdateRequest` interface
+  - [x] Implement `userService.getUserInfo()`
+  - [x] Implement `userService.updateUserInfo()`
+  - [x] Implement `userService.updateProfilePicture()` with FormData
 
-- [ ] Create `/frontend/services/loved_one.service.ts`:
-  - [ ] Import `coreApi` from `../lib/api`
-  - [ ] Import `LovedOneListResponse` from `./user.service`
-  - [ ] Implement `lovedOneService.getLovedOnes()`
-  - [ ] Re-export types from `user.service`
+- [x] Create `/frontend/services/loved_one.service.ts`:
+  - [x] Import `coreApi` from `../lib/api`
+  - [x] Import `LovedOneListResponse` from `./user.service`
+  - [x] Implement `lovedOneService.getLovedOnes()`
+  - [x] Re-export types from `user.service`
 
-- [ ] Create `/frontend/services/device.service.ts`:
-  - [ ] Import `deviceApi` from `../lib/api`
-  - [ ] Define `DeviceDataRequest` interface (based on backend schema)
-  - [ ] Define `DeviceDataResponse` interface (based on backend schema)
-  - [ ] Implement `deviceService.sendDeviceData()`
+- [x] Create `/frontend/services/device.service.ts`:
+  - [x] Import `deviceApi` from `../lib/api`
+  - [x] Define `DeviceDataRequest` interface (based on backend schema)
+  - [x] Define `DeviceDataResponse` interface (based on backend schema)
+  - [x] Implement `deviceService.sendDeviceData()`
 
 ### Phase 4: TanStack Query Integration
-- [ ] Create `/frontend/lib/queryClient.ts`:
-  - [ ] Import `QueryClient` from `@tanstack/react-query`
-  - [ ] Create and export `queryClient` with default options
-  - [ ] Configure retry, refetchOnWindowFocus, and staleTime
+- [x] Create `/frontend/lib/queryClient.ts`:
+  - [x] Import `QueryClient` from `@tanstack/react-query`
+  - [x] Create and export `queryClient` with default options
+  - [x] Configure retry, refetchOnWindowFocus, and staleTime
 
-- [ ] Update `/frontend/app/_layout.tsx`:
-  - [ ] Import `QueryClientProvider` from `@tanstack/react-query`
-  - [ ] Import `queryClient` from `../lib/queryClient`
-  - [ ] Wrap app content with `QueryClientProvider`
+- [x] Update `/frontend/app/_layout.tsx`:
+  - [x] Import `QueryClientProvider` from `@tanstack/react-query`
+  - [x] Import `queryClient` from `../lib/queryClient`
+  - [x] Wrap app content with `QueryClientProvider`
 
-- [ ] Create `/frontend/hooks/useAuth.ts`:
-  - [ ] Import TanStack Query hooks
-  - [ ] Import `authService` and storage functions
-  - [ ] Implement `useLogin()` hook
-  - [ ] Implement `useRegister()` hook
-  - [ ] Implement `useCurrentUser()` hook
-  - [ ] Implement `useLogout()` hook
+- [x] Create `/frontend/hooks/useAuth.ts`:
+  - [x] Import TanStack Query hooks
+  - [x] Import `authService` and storage functions
+  - [x] Implement `useLogin()` hook
+  - [x] Implement `useRegister()` hook
+  - [x] Implement `useCurrentUser()` hook
+  - [x] Implement `useLogout()` hook
 
-- [ ] Create `/frontend/hooks/useUser.ts`:
-  - [ ] Import TanStack Query hooks
-  - [ ] Import `userService`
-  - [ ] Implement `useUserInfo()` hook
-  - [ ] Implement `useUpdateUser()` hook
-  - [ ] Implement `useUpdateProfilePicture()` hook
+- [x] Create `/frontend/hooks/useUser.ts`:
+  - [x] Import TanStack Query hooks
+  - [x] Import `userService`
+  - [x] Implement `useUserInfo()` hook
+  - [x] Implement `useUpdateUser()` hook
+  - [x] Implement `useUpdateProfilePicture()` hook
 
-- [ ] Create `/frontend/hooks/useLovedOne.ts`:
-  - [ ] Import TanStack Query hooks
-  - [ ] Import `lovedOneService`
-  - [ ] Implement `useLovedOnes()` hook
+- [x] Create `/frontend/hooks/useLovedOne.ts`:
+  - [x] Import TanStack Query hooks
+  - [x] Import `lovedOneService`
+  - [x] Implement `useLovedOnes()` hook
 
 ### Phase 5: Auth Context Setup
-- [ ] Create `/frontend/context/AuthContext.tsx`:
-  - [ ] Import React hooks and TanStack Query
-  - [ ] Import `authService` and types
-  - [ ] Import `User` type from `user.service`
-  - [ ] Import storage functions
-  - [ ] Define `AuthContextType` interface
-  - [ ] Create `AuthContext` using `createContext`
-  - [ ] Create `AuthProvider` component:
-    - [ ] Set up state for `user` and `isInitializing`
-    - [ ] Implement `useQuery` for fetching current user
-    - [ ] Implement `useEffect` for auth initialization
-    - [ ] Implement `login()` function
-    - [ ] Implement `register()` function
-    - [ ] Implement `logout()` function
-    - [ ] Implement `refreshUser()` function
-    - [ ] Return `AuthContext.Provider` with value
-  - [ ] Create and export `useAuth()` hook
+- [x] Create `/frontend/context/AuthContext.tsx`:
+  - [x] Import React hooks and TanStack Query
+  - [x] Import `authService` and types
+  - [x] Import `User` type from `user.service`
+  - [x] Import storage functions
+  - [x] Define `AuthContextType` interface
+  - [x] Create `AuthContext` using `createContext`
+  - [x] Create `AuthProvider` component:
+    - [x] Set up state for `user` and `isInitializing`
+    - [x] Implement `useQuery` for fetching current user
+    - [x] Implement `useEffect` for auth initialization
+    - [x] Implement `login()` function
+    - [x] Implement `register()` function
+    - [x] Implement `logout()` function
+    - [x] Implement `refreshUser()` function
+    - [x] Return `AuthContext.Provider` with value
+  - [x] Create and export `useAuth()` hook
 
-- [ ] Update `/frontend/app/_layout.tsx`:
-  - [ ] Import `AuthProvider` from `../context/AuthContext`
-  - [ ] Wrap app with `AuthProvider` (inside `QueryClientProvider`)
+- [x] Update `/frontend/app/_layout.tsx`:
+  - [x] Import `AuthProvider` from `../context/AuthContext`
+  - [x] Wrap app with `AuthProvider` (inside `QueryClientProvider`)
 
-- [ ] Update `/frontend/lib/api.ts`:
-  - [ ] Add `logoutCallback` variable and `setLogoutCallback()` function
-  - [ ] Update response interceptor to call `logoutCallback` on refresh failure
+- [x] Update `/frontend/lib/api.ts`:
+  - [x] Add `logoutCallback` variable and `setLogoutCallback()` function
+  - [x] Update response interceptor to call `logoutCallback` on refresh failure
 
-- [ ] Update `/frontend/context/AuthContext.tsx`:
-  - [ ] Add `useEffect` to set logout callback in API interceptor
+- [x] Update `/frontend/context/AuthContext.tsx`:
+  - [x] Add `useEffect` to set logout callback in API interceptor
 
 ### Phase 6: Pull-to-Refresh Implementation
-- [ ] Create `/frontend/hooks/useRefresh.ts` (optional):
-  - [ ] Import `useQueryClient` and `useState`
-  - [ ] Implement `useRefresh()` hook with query keys parameter
-  - [ ] Return `isRefreshing` state and `onRefresh` function
+- [x] Create `/frontend/hooks/useRefresh.ts` (optional):
+  - [x] Import `useQueryClient` and `useState`
+  - [x] Implement `useRefresh()` hook with query keys parameter
+  - [x] Return `isRefreshing` state and `onRefresh` function
 
 - [ ] Test pull-to-refresh in components:
   - [ ] Add `RefreshControl` to user profile screen
