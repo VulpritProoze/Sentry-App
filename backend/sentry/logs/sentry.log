@@ -747,24 +747,8 @@ INFO 2025-12-16 02:23:07 log "POST /api/v1/device/data HTTP/1.1" 200 45
 INFO 2025-12-16 02:23:18 log "POST /api/v1/device/data HTTP/1.1" 200 45
 INFO 2025-12-16 02:23:20 log "POST /api/v1/device/data HTTP/1.1" 200 45
 INFO 2025-12-16 02:23:25 log "POST /api/v1/device/data HTTP/1.1" 200 45
-INFO 2025-12-16 22:12:00 autoreload Watching for file changes with StatReloader
-INFO 2025-12-16 22:29:57 autoreload Watching for file changes with StatReloader
-WARNING 2025-12-16 22:54:55 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
-WARNING 2025-12-16 22:55:01 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
-INFO 2025-12-16 22:55:17 autoreload Watching for file changes with StatReloader
-WARNING 2025-12-16 22:55:24 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
-WARNING 2025-12-16 22:55:32 log "POST /api/v1/core/auth/login HTTP/1.1" 401 91
-INFO 2025-12-16 22:58:59 log "POST /api/v1/core/auth/register HTTP/1.1" 200 447
-INFO 2025-12-16 22:59:01 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 57
-INFO 2025-12-16 22:59:02 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 346
-INFO 2025-12-16 22:59:58 log "POST /api/v1/core/auth/login HTTP/1.1" 200 440
-INFO 2025-12-16 23:00:00 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 57
-INFO 2025-12-16 23:00:01 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 346
-INFO 2025-12-16 23:04:16 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 57
-INFO 2025-12-16 23:04:17 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 346
-INFO 2025-12-16 23:15:38 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 57
-INFO 2025-12-16 23:15:38 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 57
-INFO 2025-12-16 23:15:39 log "GET /api/v1/core/auth/me/is-verified HTTP/1.1" 200 57
-INFO 2025-12-16 23:15:39 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 346
-INFO 2025-12-16 23:15:39 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 346
-INFO 2025-12-16 23:15:39 log "GET /api/v1/core/user/me/info HTTP/1.1" 200 346
+INFO 2025-12-16 21:58:18 autoreload Watching for file changes with StatReloader
+WARNING 2025-12-16 22:21:58 log "GET / HTTP/1.1" 404 2161
+WARNING 2025-12-16 22:21:58 log "GET /favicon.ico HTTP/1.1" 404 2212
+INFO 2025-12-16 22:22:09 log "GET /api HTTP/1.1" 301 0
+WARNING 2025-12-16 22:22:09 log "GET /api/ HTTP/1.1" 404 7107
