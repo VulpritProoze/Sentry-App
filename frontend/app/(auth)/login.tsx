@@ -1,5 +1,5 @@
 import { useThemeColors } from "@/hooks/useThemeColors";
-import { Lock, Mail, User } from "@tamagui/lucide-icons";
+import { Eye, EyeOff, Lock, Mail, User } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -12,9 +12,9 @@ import {
   XStack,
   YStack,
 } from "tamagui";
-import zxcvbn from "zxcvbn";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/useToast";
+import { API_URL } from "@/lib/api";
 
 const login = () => {
   const colors = useThemeColors();
@@ -24,6 +24,7 @@ const login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{
     usernameOrEmail?: string;
@@ -45,14 +46,6 @@ const login = () => {
   const validatePassword = (value: string) => {
     if (!value) {
       return "Password is required";
-    }
-    if (value.length < 8) {
-      return "Password must be at least 8 characters";
-    }
-    // Check against common passwords using zxcvbn
-    const result = zxcvbn(value);
-    if (result.score < 2) {
-      return "Password is too weak or too common. Please choose a stronger password.";
     }
     return undefined;
   };
@@ -99,6 +92,18 @@ const login = () => {
         [isEmail ? "email" : "username"]: usernameOrEmail,
         password,
       };
+
+      // Temporary console logs for testing
+      const baseURL = `${API_URL}/core`;
+      console.log("=== LOGIN SUBMIT DEBUG ===");
+      console.log("Base URL:", baseURL);
+      console.log("Full Login Endpoint:", `${baseURL}/auth/login`);
+      console.log("Credentials:", {
+        [isEmail ? "email" : "username"]: usernameOrEmail,
+        password: "[REDACTED]",
+      });
+      console.log("Remember Me:", rememberMe);
+      console.log("=========================");
 
       // Pass rememberMe to the login function
       await login(credentials, rememberMe);
@@ -185,6 +190,7 @@ const login = () => {
                 backgroundColor={colors.background}
                 borderRadius="$4"
                 paddingLeft="$3"
+                paddingRight="$2"
                 gap="$2"
               >
                 <Lock size={20} color={colors.gray[200]} />
@@ -192,7 +198,7 @@ const login = () => {
                   placeholder="Enter password"
                   value={password}
                   onChangeText={handlePasswordChange}
-                  secureTextEntry
+                  secureTextEntry={!showPassword}
                   borderWidth={0}
                   flex={1}
                   backgroundColor="transparent"
@@ -205,6 +211,19 @@ const login = () => {
                     }));
                   }}
                 />
+                <Button
+                  variant="outlined"
+                  borderWidth={0}
+                  backgroundColor="transparent"
+                  padding="$2"
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff size={20} color={colors.gray[200]} />
+                  ) : (
+                    <Eye size={20} color={colors.gray[200]} />
+                  )}
+                </Button>
               </XStack>
               {errors.password && (
                 <Text color={colors.red} fontSize={"$2"}>

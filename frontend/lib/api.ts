@@ -2,7 +2,8 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { getStoredRefreshToken, getStoredToken, storeTokens, clearStoredTokens } from './storage';
 
 // Base API URL from environment
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+// In Expo, environment variables must be prefixed with EXPO_PUBLIC_ to be accessible in client code
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
 // Logout callback for handling refresh failures
 let logoutCallback: (() => void) | null = null;
