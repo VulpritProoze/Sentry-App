@@ -154,7 +154,16 @@ export function DeviceProvider({ children }: { children: React.ReactNode }) {
         setCurrentGPSData(gpsData);
       }
     });
-  }, [isInitialized]);
+
+    // Set disconnection callback to handle unexpected disconnections
+    bleManagerRef.current.setDisconnectedCallback((deviceId: string, error?: any) => {
+      console.log('🔌 DeviceContext: Device disconnected unexpectedly', { deviceId, error });
+      // Update state to reflect disconnection
+      setIsConnected(false);
+      setCurrentReading(null);
+      // Don't clear GPS data as it comes from location service
+    });
+  }, [isInitialized, isGPSEnabled]);
 
   const stopReceiving = useCallback(() => {
     if (!bleManagerRef.current || !isInitialized) return;

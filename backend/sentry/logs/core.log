@@ -388,3 +388,14 @@ INFO 2025-12-18 02:48:51 gemini_service [OK] Gemini AI analysis complete | model
 INFO 2025-12-18 02:49:06 gemini_service [INFO] Available Gemini models: models/embedding-gecko-001, models/gemini-2.5-flash, models/gemini-2.5-pro, models/gemini-2.0-flash-exp, models/gemini-2.0-flash, models/gemini-2.0-flash-001, models/gemini-2.0-flash-exp-image-generation, models/gemini-2.0-flash-lite-001, models/gemini-2.0-flash-lite, models/gemini-2.0-flash-lite-preview-02-05
 INFO 2025-12-18 02:49:06 gemini_service [AI] Calling Gemini AI for crash analysis | model=gemini-2.0-flash-exp | sensor_data_points=0 | context_seconds=45 | current_reading: ax=0.31, ay=0.04, az=-0.42 | roll=174.4 deg, pitch=-36.3 deg | tilt_detected=True | prompt_length=1326
 INFO 2025-12-18 02:49:08 gemini_service [OK] Gemini AI analysis complete | model=gemini-2.0-flash-exp | is_crash=False | confidence=0.30 | severity=low | crash_type=false_positive | false_positive_risk=0.70 | key_indicators=3 | reasoning_length=303 | reasoning=The calculated G-force is relatively low (0.05g). The tilt angles are significant, but the helmet could have been removed or the motorcycle could have...
+INFO 2025-12-18 05:09:09 auth_router === LOGIN ENDPOINT REQUEST BODY ===
+INFO 2025-12-18 05:09:09 auth_router Username: 'sentry'
+INFO 2025-12-18 05:09:09 auth_router Email: ''
+INFO 2025-12-18 05:09:09 auth_router Password present: True
+INFO 2025-12-18 05:09:09 auth_router ===================================
+INFO 2025-12-18 05:09:09 auth_controller === LOGIN REQUEST BODY ===
+INFO 2025-12-18 05:09:09 auth_controller Username: 'sentry'
+INFO 2025-12-18 05:09:09 auth_controller Email: ''
+INFO 2025-12-18 05:09:09 auth_controller Password present: True
+INFO 2025-12-18 05:09:09 auth_controller =========================
+INFO 2025-12-18 05:09:09 auth_controller Attempting authentication for identifier: 'sentry'

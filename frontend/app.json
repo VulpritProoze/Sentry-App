@@ -65,6 +65,16 @@
           "modes": ["peripheral", "central"],
           "bluetoothAlwaysPermission": "Allow $(PRODUCT_NAME) to connect to Bluetooth devices to receive sensor data from your Sentry helmet device."
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to track your position and calculate speed for crash detection.",
+          "locationAlwaysPermission": "Allow $(PRODUCT_NAME) to use your location in the background for crash detection.",
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to track your position and calculate speed for crash detection.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true
+        }
       ]
     ],
     "experiments": {

@@ -25,6 +25,7 @@ export class BLEManager {
   private gpsDataBuffer: string = ''; // Buffer for accumulating GPS BLE packets
   private bufferTimeout: ReturnType<typeof setTimeout> | null = null;
   private reconnectCallback?: (deviceId: string) => void;
+  private onDisconnectedCallback?: (deviceId: string, error?: any) => void;
   private shouldReconnect: boolean = false;
   private reconnectDeviceId: string | null = null;
   private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -399,38 +400,44 @@ export class BLEManager {
 
               // Set up monitoring for characteristic updates
               this.monitorSubscription = characteristic.monitor((error: any, char: Characteristic | null) => {
-          if (error) {
-            // Ignore errors when device is disconnecting (this is expected)
-            if (error.message?.includes('canceled') || error.message?.includes('disconnected') || error.message?.includes('Unknown error')) {
+          try {
+            if (error) {
+              // Ignore errors when device is disconnecting (this is expected)
+              if (error.message?.includes('canceled') || error.message?.includes('disconnected') || error.message?.includes('Unknown error')) {
+                return;
+              }
+              console.error('❌ Error monitoring characteristic:', error);
               return;
             }
-            console.error('❌ Error monitoring characteristic:', error);
-            return;
-          }
 
-          if (!char || !char.value) {
-            return;
-          }
+            if (!char || !char.value) {
+              return;
+            }
 
-        try {
-          // Debug: Log when data arrives
-          const base64Value = char.value || '';
-          console.log('📦 BLE notification received, base64 length:', base64Value.length);
-          console.log('📦 Base64 value (first 60 chars):', base64Value.substring(0, 60));
-          console.log('📦 Current buffer size BEFORE processing:', this.dataBuffer.length, 'chars');
-          
-          // Parse base64 value to sensor data
-          const sensorData = this.parseSensorData(base64Value, deviceId);
-          // Only process if we got valid data (null means incomplete, wait for more)
-          if (sensorData) {
-            console.log('✅ Successfully parsed complete sensor data from BLE');
-            this.onDataReceived?.(sensorData);
-          } else {
-            console.log('⏳ Data incomplete, waiting for more chunks (buffer size AFTER processing:', this.dataBuffer.length, 'chars)');
+            try {
+              // Debug: Log when data arrives
+              const base64Value = char.value || '';
+              console.log('📦 BLE notification received, base64 length:', base64Value.length);
+              console.log('📦 Base64 value (first 60 chars):', base64Value.substring(0, 60));
+              console.log('📦 Current buffer size BEFORE processing:', this.dataBuffer.length, 'chars');
+              
+              // Parse base64 value to sensor data
+              const sensorData = this.parseSensorData(base64Value, deviceId);
+              // Only process if we got valid data (null means incomplete, wait for more)
+              if (sensorData) {
+                console.log('✅ Successfully parsed complete sensor data from BLE');
+                this.onDataReceived?.(sensorData);
+              } else {
+                console.log('⏳ Data incomplete, waiting for more chunks (buffer size AFTER processing:', this.dataBuffer.length, 'chars)');
+              }
+            } catch (parseError) {
+              console.error('❌ Error parsing sensor data:', parseError);
+            }
+          } catch (monitorError) {
+            // Catch any unexpected errors in the monitor callback to prevent crashes
+            console.error('❌ Unexpected error in monitor callback:', monitorError);
+            // Don't throw - just log and continue
           }
-        } catch (error) {
-          console.error('❌ Error parsing sensor data:', error);
-        }
         });
 
         // Subscribe to GPS data characteristic
@@ -438,37 +445,69 @@ export class BLEManager {
 
         // Set up connection state monitoring
         this.subscription = deviceWithServices.onDisconnected((error: any, device: Device) => {
-          if (error) {
-            console.error('❌ Device disconnected with error:', error);
-          } else {
-            console.log('🔌 Device disconnected:', device?.id);
-          }
-          
-          const disconnectedDeviceId = device?.id || deviceId;
-          
-          // Clean up subscriptions
-          if (this.monitorSubscription) {
-            this.monitorSubscription.remove();
-            this.monitorSubscription = null;
-          }
-          if (this.gpsMonitorSubscription) {
-            this.gpsMonitorSubscription.remove();
-            this.gpsMonitorSubscription = null;
-          }
-          
-          // Clear device references
-          this.connectedDevice = null;
-          this.connectedDeviceInstance = null;
-          
-          // Attempt reconnection if enabled
-          if (this.shouldReconnect && disconnectedDeviceId && this.reconnectAttempts < this.maxReconnectAttempts) {
-            this.reconnectDeviceId = disconnectedDeviceId;
-            this.attemptReconnection();
-          } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-            console.warn(`⚠️ Max reconnection attempts (${this.maxReconnectAttempts}) reached. Stopping reconnection.`);
-            this.shouldReconnect = false;
-            this.reconnectDeviceId = null;
-            this.reconnectAttempts = 0;
+          try {
+            if (error) {
+              console.error('❌ Device disconnected with error:', error);
+            } else {
+              console.log('🔌 Device disconnected:', device?.id);
+            }
+            
+            const disconnectedDeviceId = device?.id || deviceId;
+            
+            // Clean up subscriptions safely
+            try {
+              if (this.monitorSubscription) {
+                this.monitorSubscription.remove();
+                this.monitorSubscription = null;
+              }
+            } catch (cleanupError) {
+              console.warn('⚠️ Error cleaning up monitor subscription (expected if already disconnected):', cleanupError);
+            }
+            
+            try {
+              if (this.gpsMonitorSubscription) {
+                this.gpsMonitorSubscription.remove();
+                this.gpsMonitorSubscription = null;
+              }
+            } catch (cleanupError) {
+              console.warn('⚠️ Error cleaning up GPS monitor subscription (expected if already disconnected):', cleanupError);
+            }
+            
+            // Clear device references
+            this.connectedDevice = null;
+            this.connectedDeviceInstance = null;
+            
+            // Notify callback about disconnection
+            if (this.onDisconnectedCallback) {
+              try {
+                this.onDisconnectedCallback(disconnectedDeviceId, error);
+              } catch (callbackError) {
+                console.error('❌ Error in disconnection callback:', callbackError);
+              }
+            }
+            
+            // Attempt reconnection if enabled
+            if (this.shouldReconnect && disconnectedDeviceId && this.reconnectAttempts < this.maxReconnectAttempts) {
+              this.reconnectDeviceId = disconnectedDeviceId;
+              this.attemptReconnection();
+            } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+              console.warn(`⚠️ Max reconnection attempts (${this.maxReconnectAttempts}) reached. Stopping reconnection.`);
+              this.shouldReconnect = false;
+              this.reconnectDeviceId = null;
+              this.reconnectAttempts = 0;
+            }
+          } catch (unexpectedError) {
+            console.error('❌ Unexpected error in onDisconnected handler:', unexpectedError);
+            // Still try to clean up state
+            this.connectedDevice = null;
+            this.connectedDeviceInstance = null;
+            if (this.onDisconnectedCallback) {
+              try {
+                this.onDisconnectedCallback(device?.id || deviceId, unexpectedError);
+              } catch (callbackError) {
+                console.error('❌ Error in disconnection callback during error handling:', callbackError);
+              }
+            }
           }
         });
 
@@ -631,6 +670,13 @@ export class BLEManager {
   }
 
   /**
+   * Set callback for device disconnection
+   */
+  setDisconnectedCallback(callback: (deviceId: string, error?: any) => void): void {
+    this.onDisconnectedCallback = callback;
+  }
+
+  /**
    * Subscribe to GPS data characteristic
    */
   private async subscribeToGPSData(device: Device, deviceId: string): Promise<void> {
@@ -667,27 +713,33 @@ export class BLEManager {
 
       // Set up monitoring for GPS characteristic updates
       this.gpsMonitorSubscription = gpsCharacteristic.monitor((error: any, char: Characteristic | null) => {
-        if (error) {
-          // Ignore errors when device is disconnecting (this is expected)
-          if (error.message?.includes('canceled') || error.message?.includes('disconnected') || error.message?.includes('Unknown error')) {
+        try {
+          if (error) {
+            // Ignore errors when device is disconnecting (this is expected)
+            if (error.message?.includes('canceled') || error.message?.includes('disconnected') || error.message?.includes('Unknown error')) {
+              return;
+            }
+            console.error('❌ Error monitoring GPS characteristic:', error);
             return;
           }
-          console.error('❌ Error monitoring GPS characteristic:', error);
-          return;
-        }
 
-        if (!char || !char.value) {
-          return;
-        }
-
-        try {
-          const base64Value = char.value || '';
-          const gpsData = this.parseGPSData(base64Value, deviceId);
-          if (gpsData) {
-            this.onGPSDataReceived?.(gpsData);
+          if (!char || !char.value) {
+            return;
           }
-        } catch (error) {
-          console.error('❌ Error parsing GPS data:', error);
+
+          try {
+            const base64Value = char.value || '';
+            const gpsData = this.parseGPSData(base64Value, deviceId);
+            if (gpsData) {
+              this.onGPSDataReceived?.(gpsData);
+            }
+          } catch (parseError) {
+            console.error('❌ Error parsing GPS data:', parseError);
+          }
+        } catch (monitorError) {
+          // Catch any unexpected errors in the monitor callback to prevent crashes
+          console.error('❌ Unexpected error in GPS monitor callback:', monitorError);
+          // Don't throw - just log and continue
         }
       });
 
@@ -947,37 +999,74 @@ export class BLEManager {
    * Cleanup resources
    */
   cleanup(): void {
-    if (this.stopScanTimeout) {
-      clearTimeout(this.stopScanTimeout);
-      this.stopScanTimeout = null;
-    }
-    
-    if (this.bufferTimeout) {
-      clearTimeout(this.bufferTimeout);
-      this.bufferTimeout = null;
-    }
-    
-    if (this.subscription) {
-      this.subscription.remove();
+    try {
+      if (this.stopScanTimeout) {
+        clearTimeout(this.stopScanTimeout);
+        this.stopScanTimeout = null;
+      }
+      
+      if (this.bufferTimeout) {
+        clearTimeout(this.bufferTimeout);
+        this.bufferTimeout = null;
+      }
+      
+      if (this.reconnectTimeout) {
+        clearTimeout(this.reconnectTimeout);
+        this.reconnectTimeout = null;
+      }
+      
+      // Safely remove subscriptions (they might already be removed)
+      try {
+        if (this.subscription) {
+          this.subscription.remove();
+          this.subscription = null;
+        }
+      } catch (error) {
+        console.warn('⚠️ Error removing subscription (expected if already removed):', error);
+        this.subscription = null;
+      }
+      
+      try {
+        if (this.monitorSubscription) {
+          this.monitorSubscription.remove();
+          this.monitorSubscription = null;
+        }
+      } catch (error) {
+        console.warn('⚠️ Error removing monitor subscription (expected if already removed):', error);
+        this.monitorSubscription = null;
+      }
+      
+      try {
+        if (this.gpsMonitorSubscription) {
+          this.gpsMonitorSubscription.remove();
+          this.gpsMonitorSubscription = null;
+        }
+      } catch (error) {
+        console.warn('⚠️ Error removing GPS monitor subscription (expected if already removed):', error);
+        this.gpsMonitorSubscription = null;
+      }
+      
+      try {
+        this.manager.stopDeviceScan();
+      } catch (error) {
+        console.warn('⚠️ Error stopping device scan (expected if not scanning):', error);
+      }
+      
+      this.scanning = false;
+      this.dataBuffer = ''; // Clear buffer on cleanup
+      this.gpsDataBuffer = ''; // Clear GPS buffer on cleanup
+      this.onDataReceived = undefined;
+      this.onGPSDataReceived = undefined;
+      this.onDisconnectedCallback = undefined;
+    } catch (error) {
+      console.error('❌ Unexpected error during cleanup:', error);
+      // Still clear references to prevent memory leaks
       this.subscription = null;
-    }
-    
-    if (this.monitorSubscription) {
-      this.monitorSubscription.remove();
       this.monitorSubscription = null;
-    }
-    
-    if (this.gpsMonitorSubscription) {
-      this.gpsMonitorSubscription.remove();
       this.gpsMonitorSubscription = null;
+      this.connectedDevice = null;
+      this.connectedDeviceInstance = null;
     }
-    
-    this.manager.stopDeviceScan();
-    this.scanning = false;
-    this.dataBuffer = ''; // Clear buffer on cleanup
-    this.gpsDataBuffer = ''; // Clear GPS buffer on cleanup
-    this.onDataReceived = undefined;
-    this.onGPSDataReceived = undefined;
   }
 
   /**
