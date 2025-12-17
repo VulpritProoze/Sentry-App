@@ -5,6 +5,7 @@ export const CRASH_DETECTION_CONFIG = {
   tiltThreshold: 90.0,
   consecutiveTriggers: 2,
   lookbackSeconds: 30,
+  crashAlertIntervalSeconds: 15, // Minimum interval between crash alert API calls (configurable)
 } as const;
 
 // ESP32 BLE Service and Characteristic UUIDs (matching ESP32 code)

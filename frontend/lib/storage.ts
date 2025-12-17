@@ -80,3 +80,31 @@ export const getStoredThemePreference = async (): Promise<'light' | 'dark' | 'sy
   }
 };
 
+// Crash alert interval storage
+const CRASH_ALERT_INTERVAL_KEY = 'sentry_crash_alert_interval';
+
+export const storeCrashAlertInterval = async (intervalSeconds: number): Promise<void> => {
+  try {
+    await SecureStore.setItemAsync(CRASH_ALERT_INTERVAL_KEY, intervalSeconds.toString());
+  } catch (error) {
+    console.error('Error storing crash alert interval:', error);
+    throw error;
+  }
+};
+
+export const getStoredCrashAlertInterval = async (): Promise<number | null> => {
+  try {
+    const value = await SecureStore.getItemAsync(CRASH_ALERT_INTERVAL_KEY);
+    if (value) {
+      const interval = parseInt(value, 10);
+      if (!isNaN(interval) && interval > 0) {
+        return interval;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Error retrieving crash alert interval:', error);
+    return null;
+  }
+};
+

@@ -2,11 +2,13 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useToast } from "@/hooks/useToast";
 import { useAuth } from "@/context/AuthContext";
-import { LogOut, Moon, Palette, Settings, Sun, User } from "@tamagui/lucide-icons";
+import { LogOut, Moon, Palette, Settings, Sun, User, AlertTriangle } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Card, ScrollView, Text, XStack, YStack, Button } from "tamagui";
+import { Card, ScrollView, Text, XStack, YStack, Button, Input } from "tamagui";
 import { Pressable, StyleSheet } from "react-native";
+import { storeCrashAlertInterval, getStoredCrashAlertInterval } from "@/lib/storage";
+import { CRASH_DETECTION_CONFIG } from "@/utils/constants";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -20,10 +22,28 @@ const settings = () => {
   const router = useRouter();
   const { logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [crashAlertInterval, setCrashAlertInterval] = useState<number>(
+    CRASH_DETECTION_CONFIG.crashAlertIntervalSeconds
+  );
+  const [intervalInput, setIntervalInput] = useState<string>(
+    CRASH_DETECTION_CONFIG.crashAlertIntervalSeconds.toString()
+  );
   const isDark = activeTheme === "dark";
   
   // Animated value for switch position (0 = left, 24 = right)
   const translateX = useSharedValue(isDark ? 24 : 0);
+
+  // Load crash alert interval from storage
+  useEffect(() => {
+    const loadInterval = async () => {
+      const stored = await getStoredCrashAlertInterval();
+      if (stored) {
+        setCrashAlertInterval(stored);
+        setIntervalInput(stored.toString());
+      }
+    };
+    loadInterval();
+  }, []);
 
   // Update animation when theme changes
   useEffect(() => {
@@ -53,6 +73,22 @@ const settings = () => {
       toast.showError("Logout Failed", errorMessage);
     } finally {
       setIsLoggingOut(false);
+    }
+  };
+
+  const handleIntervalChange = async (value: string) => {
+    setIntervalInput(value);
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue) && numValue > 0 && numValue <= 300) {
+      // Valid range: 1-300 seconds
+      setCrashAlertInterval(numValue);
+      try {
+        await storeCrashAlertInterval(numValue);
+        toast.showSuccess("Setting Saved", `Crash alert interval set to ${numValue} seconds`);
+      } catch (error) {
+        console.error("Error saving crash alert interval:", error);
+        toast.showError("Save Failed", "Failed to save crash alert interval");
+      }
     }
   };
   
@@ -150,6 +186,46 @@ const settings = () => {
                   </Animated.View>
                 </Pressable>
               </XStack>
+            </YStack>
+
+            {/* Divider */}
+            <XStack
+              height={1}
+              backgroundColor={colors.border}
+              marginVertical={"$2"}
+            />
+
+            {/* Crash Detection Section */}
+            <YStack gap={"$3"}>
+              <XStack alignItems="center" gap={"$2"}>
+                <AlertTriangle color={colors.orange[500]} size={20} />
+                <Text color={colors.text} fontSize={"$5"} fontWeight={"500"}>
+                  Crash Detection
+                </Text>
+              </XStack>
+              <YStack gap={"$2"}>
+                <Text color={colors.gray[200]} fontSize={"$3"}>
+                  Alert Interval (seconds)
+                </Text>
+                <Text color={colors.gray[300]} fontSize={"$2"}>
+                  Minimum time between crash alert API calls. Prevents excessive requests.
+                </Text>
+                <Input
+                  value={intervalInput}
+                  onChangeText={handleIntervalChange}
+                  keyboardType="numeric"
+                  placeholder="15"
+                  backgroundColor={colors.background}
+                  borderColor={colors.border}
+                  color={colors.text}
+                  fontSize={"$4"}
+                  paddingHorizontal={"$3"}
+                  paddingVertical={"$2"}
+                />
+                <Text color={colors.gray[300]} fontSize={"$2"}>
+                  Current: {crashAlertInterval} seconds (Range: 1-300)
+                </Text>
+              </YStack>
             </YStack>
 
             {/* Divider */}

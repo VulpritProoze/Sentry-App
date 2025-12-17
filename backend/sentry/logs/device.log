@@ -135,3 +135,66 @@ INFO 2025-12-17 18:52:46 fcm_controller FCM token updated for device V2038 (plat
 INFO 2025-12-17 18:52:53 fcm_controller FCM token updated for device V2038 (platform: android, user: 1)
 INFO 2025-12-17 18:53:01 fcm_controller FCM token updated for device V2038 (platform: android, user: 1)
 INFO 2025-12-17 18:53:54 fcm_controller FCM token updated for device V2038 (platform: android, user: 1)
+INFO 2025-12-18 01:32:26 crash_router [IN] POST /api/v1/device/crash/alert - Crash alert endpoint called (device_id=44:1D:64:F3:D8:D6, timestamp=2025-12-17T17:32:26.936Z)
+INFO 2025-12-18 01:32:26 crash_controller [IN] Crash alert received | device_id=44:1D:64:F3:D8:D6 | timestamp=2025-12-17T17:32:26.936Z | threshold_severity=medium | trigger_type=tilt | g_force=0.05g | sensor: ax=0.29, ay=0.01, az=-0.43 | roll=179.2 deg, pitch=-33.8 deg | tilt_detected=True | GPS: no data
+INFO 2025-12-18 01:32:30 crash_controller [DATA] Retrieved 0 sensor data points for context (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:32:30 crash_controller [AI] Calling Gemini AI for crash analysis (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:32:31 crash_controller [OK] AI analysis complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | confidence=0.50 | severity=low | crash_type=unknown | false_positive_risk=0.80 | reasoning=AI analysis unavailable - defaulting to false positive...
+INFO 2025-12-18 01:32:31 crash_controller [OK] False positive detected by AI - no crash event created (device_id=44:1D:64:F3:D8:D6, confidence=0.50, false_positive_risk=0.80)
+INFO 2025-12-18 01:32:31 crash_controller [OUT] Crash alert processing complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | crash_event_created=False | crash_event_id=None
+INFO 2025-12-18 01:32:31 crash_router [OK] POST /api/v1/device/crash/alert - Successfully processed (device_id=44:1D:64:F3:D8:D6, is_crash=False)
+INFO 2025-12-18 01:37:14 crash_router [IN] POST /api/v1/device/crash/alert - Crash alert endpoint called (device_id=44:1D:64:F3:D8:D6, timestamp=2025-12-17T17:37:14.982Z)
+INFO 2025-12-18 01:37:14 crash_controller [IN] Crash alert received | device_id=44:1D:64:F3:D8:D6 | timestamp=2025-12-17T17:37:14.982Z | threshold_severity=medium | trigger_type=tilt | g_force=0.05g | sensor: ax=0.19, ay=-0.15, az=-0.45 | roll=-161.6 deg, pitch=-22.1 deg | tilt_detected=True | GPS: no data
+INFO 2025-12-18 01:37:17 crash_controller [DATA] Retrieved 0 sensor data points for context (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:37:17 crash_controller [AI] Calling Gemini AI for crash analysis (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:37:17 crash_controller [OK] AI analysis complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | confidence=0.50 | severity=low | crash_type=unknown | false_positive_risk=0.80 | reasoning=AI analysis unavailable - defaulting to false positive...
+INFO 2025-12-18 01:37:17 crash_controller [OK] False positive detected by AI - no crash event created (device_id=44:1D:64:F3:D8:D6, confidence=0.50, false_positive_risk=0.80)
+INFO 2025-12-18 01:37:17 crash_controller [OUT] Crash alert processing complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | crash_event_created=False | crash_event_id=None
+INFO 2025-12-18 01:37:17 crash_router [OK] POST /api/v1/device/crash/alert - Successfully processed (device_id=44:1D:64:F3:D8:D6, is_crash=False)
+INFO 2025-12-18 01:43:57 crash_router [IN] POST /api/v1/device/crash/alert - Crash alert endpoint called (device_id=44:1D:64:F3:D8:D6, timestamp=2025-12-17T17:43:56.185Z)
+INFO 2025-12-18 01:43:57 crash_controller [IN] Crash alert received | device_id=44:1D:64:F3:D8:D6 | timestamp=2025-12-17T17:43:56.185Z | threshold_severity=medium | trigger_type=tilt | g_force=0.05g | sensor: ax=0.25, ay=-0.02, az=-0.43 | roll=-177.8 deg, pitch=-30.1 deg | tilt_detected=True | GPS: no data
+INFO 2025-12-18 01:43:59 crash_controller [DATA] Retrieved 0 sensor data points for context (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:43:59 crash_controller [AI] Calling Gemini AI for crash analysis (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:44:01 crash_controller [OK] AI analysis complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | confidence=0.30 | severity=low | crash_type=false_positive | false_positive_risk=0.70 | reasoning=The calculated G-force is relatively low (0.05g) despite the tilt alert. The tilt is significant, bu...
+INFO 2025-12-18 01:44:01 crash_controller [OK] False positive detected by AI - no crash event created (device_id=44:1D:64:F3:D8:D6, confidence=0.30, false_positive_risk=0.70)
+INFO 2025-12-18 01:44:01 crash_controller [OUT] Crash alert processing complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | crash_event_created=False | crash_event_id=None
+INFO 2025-12-18 01:44:01 crash_router [OK] POST /api/v1/device/crash/alert - Successfully processed (device_id=44:1D:64:F3:D8:D6, is_crash=False)
+INFO 2025-12-18 01:44:25 crash_router [IN] POST /api/v1/device/crash/alert - Crash alert endpoint called (device_id=44:1D:64:F3:D8:D6, timestamp=2025-12-17T17:44:26.273Z)
+INFO 2025-12-18 01:44:25 crash_controller [IN] Crash alert received | device_id=44:1D:64:F3:D8:D6 | timestamp=2025-12-17T17:44:26.273Z | threshold_severity=medium | trigger_type=tilt | g_force=0.05g | sensor: ax=-0.40, ay=-0.19, az=-0.14 | roll=-125.4 deg, pitch=59.0 deg | tilt_detected=True | GPS: no data
+INFO 2025-12-18 01:44:27 crash_controller [DATA] Retrieved 0 sensor data points for context (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:44:27 crash_controller [AI] Calling Gemini AI for crash analysis (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:44:29 crash_controller [OK] AI analysis complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | confidence=0.30 | severity=low | crash_type=false_positive | false_positive_risk=0.70 | reasoning=The G-force is low (0.05g). The tilt angles are extreme (roll=-125.4°, pitch=59.0°), but the low G-f...
+INFO 2025-12-18 01:44:29 crash_controller [OK] False positive detected by AI - no crash event created (device_id=44:1D:64:F3:D8:D6, confidence=0.30, false_positive_risk=0.70)
+INFO 2025-12-18 01:44:29 crash_controller [OUT] Crash alert processing complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | crash_event_created=False | crash_event_id=None
+INFO 2025-12-18 01:44:29 crash_router [OK] POST /api/v1/device/crash/alert - Successfully processed (device_id=44:1D:64:F3:D8:D6, is_crash=False)
+INFO 2025-12-18 01:44:40 crash_router [IN] POST /api/v1/device/crash/alert - Crash alert endpoint called (device_id=44:1D:64:F3:D8:D6, timestamp=2025-12-17T17:44:41.287Z)
+INFO 2025-12-18 01:44:40 crash_controller [IN] Crash alert received | device_id=44:1D:64:F3:D8:D6 | timestamp=2025-12-17T17:44:41.287Z | threshold_severity=medium | trigger_type=tilt | g_force=0.05g | sensor: ax=-0.39, ay=-0.09, az=-0.29 | roll=-162.2 deg, pitch=52.4 deg | tilt_detected=True | GPS: no data
+INFO 2025-12-18 01:44:43 crash_controller [DATA] Retrieved 0 sensor data points for context (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:44:43 crash_controller [AI] Calling Gemini AI for crash analysis (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:44:45 crash_controller [OK] AI analysis complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | confidence=0.30 | severity=low | crash_type=false_positive | false_positive_risk=0.70 | reasoning=The G-force is low (0.05g), which is unlikely for a crash. The tilt is significant, but could be cau...
+INFO 2025-12-18 01:44:45 crash_controller [OK] False positive detected by AI - no crash event created (device_id=44:1D:64:F3:D8:D6, confidence=0.30, false_positive_risk=0.70)
+INFO 2025-12-18 01:44:45 crash_controller [OUT] Crash alert processing complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | crash_event_created=False | crash_event_id=None
+INFO 2025-12-18 01:44:45 crash_router [OK] POST /api/v1/device/crash/alert - Successfully processed (device_id=44:1D:64:F3:D8:D6, is_crash=False)
+INFO 2025-12-18 01:45:18 crash_router [IN] POST /api/v1/device/crash/alert - Crash alert endpoint called (device_id=44:1D:64:F3:D8:D6, timestamp=2025-12-17T17:45:19.071Z)
+INFO 2025-12-18 01:45:18 crash_controller [IN] Crash alert received | device_id=44:1D:64:F3:D8:D6 | timestamp=2025-12-17T17:45:19.071Z | threshold_severity=medium | trigger_type=tilt | g_force=0.05g | sensor: ax=0.28, ay=0.23, az=-0.37 | roll=147.6 deg, pitch=-32.3 deg | tilt_detected=True | GPS: no data
+INFO 2025-12-18 01:45:20 crash_controller [DATA] Retrieved 0 sensor data points for context (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:45:20 crash_controller [AI] Calling Gemini AI for crash analysis (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:45:22 crash_controller [OK] AI analysis complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | confidence=0.30 | severity=low | crash_type=false_positive | false_positive_risk=0.70 | reasoning=The G-force is relatively low (0.05g). The tilt is significant, but without historical data to show ...
+INFO 2025-12-18 01:45:22 crash_controller [OK] False positive detected by AI - no crash event created (device_id=44:1D:64:F3:D8:D6, confidence=0.30, false_positive_risk=0.70)
+INFO 2025-12-18 01:45:22 crash_controller [OUT] Crash alert processing complete | device_id=44:1D:64:F3:D8:D6 | is_crash=False | crash_event_created=False | crash_event_id=None
+INFO 2025-12-18 01:45:22 crash_router [OK] POST /api/v1/device/crash/alert - Successfully processed (device_id=44:1D:64:F3:D8:D6, is_crash=False)
+INFO 2025-12-18 01:45:35 crash_router [IN] POST /api/v1/device/crash/alert - Crash alert endpoint called (device_id=44:1D:64:F3:D8:D6, timestamp=2025-12-17T17:45:36.501Z)
+INFO 2025-12-18 01:45:35 crash_controller [IN] Crash alert received | device_id=44:1D:64:F3:D8:D6 | timestamp=2025-12-17T17:45:36.501Z | threshold_severity=medium | trigger_type=tilt | g_force=0.06g | sensor: ax=0.55, ay=-0.06, az=-0.14 | roll=-156.2 deg, pitch=-73.8 deg | tilt_detected=True | GPS: no data
+INFO 2025-12-18 01:45:37 crash_controller [DATA] Retrieved 0 sensor data points for context (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:45:37 crash_controller [AI] Calling Gemini AI for crash analysis (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:45:39 crash_controller [OK] AI analysis complete | device_id=44:1D:64:F3:D8:D6 | is_crash=True | confidence=0.75 | severity=medium | crash_type=fall | false_positive_risk=0.25 | reasoning=The extreme roll and pitch angles, combined with the tilt detection and acceleration, suggest a fall...
+INFO 2025-12-18 01:45:39 crash_controller [CRASH] Crash confirmed by AI - creating CrashEvent (device_id=44:1D:64:F3:D8:D6, severity=medium, confidence=0.75)
+WARNING 2025-12-18 01:45:39 crash_controller [WARN] No GPS fix available at crash time (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:45:39 crash_controller [SAVE] CrashEvent created successfully | crash_event_id=1 | device_id=44:1D:64:F3:D8:D6 | severity=medium | confidence=0.75
+INFO 2025-12-18 01:45:39 crash_controller [FCM] Sending FCM push notification (device_id=44:1D:64:F3:D8:D6, severity=medium, crash_event_id=1)
+WARNING 2025-12-18 01:45:39 fcm_service No Expo push token found for device 44:1D:64:F3:D8:D6
+WARNING 2025-12-18 01:45:39 crash_controller [WARN] FCM notification failed to send (device_id=44:1D:64:F3:D8:D6)
+INFO 2025-12-18 01:45:39 crash_controller [LOVED_ONES] Notifying loved ones with GPS location (device_id=44:1D:64:F3:D8:D6, crash_event_id=1)
+WARNING 2025-12-18 01:45:39 crash_utils No user associated with crash event 1
+INFO 2025-12-18 01:45:39 crash_controller [OUT] Crash alert processing complete | device_id=44:1D:64:F3:D8:D6 | is_crash=True | crash_event_created=True | crash_event_id=1
+INFO 2025-12-18 01:45:39 crash_router [OK] POST /api/v1/device/crash/alert - Successfully processed (device_id=44:1D:64:F3:D8:D6, is_crash=True)

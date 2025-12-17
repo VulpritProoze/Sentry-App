@@ -33,9 +33,52 @@ class GeminiService:
         # Initialize client with API key
         try:
             self.client = genai.Client(api_key=app_settings.gemini_api_key)
+            # Try to list available models to verify connection and find working model
+            self._verify_model_availability()
         except Exception as e:
-            logger.error(f"Failed to initialize Gemini client: {e}")
+            logger.error("Failed to initialize Gemini client: %s", e)
             self.client = None
+
+    def _verify_model_availability(self) -> None:
+        """Verify that the configured model is available, or suggest alternatives."""
+        if self.client is None:
+            return
+        
+        try:
+            # List available models
+            models = list(self.client.models.list())
+            available_model_names = [model.name for model in models if hasattr(model, 'name')]
+            
+            if available_model_names:
+                logger.info(
+                    "[INFO] Available Gemini models: %s",
+                    ", ".join(available_model_names[:10])  # Show first 10
+                )
+                
+                # Check if configured model is available
+                # Model names might be in format like "models/gemini-1.5-flash" or just "gemini-1.5-flash"
+                model_found = False
+                for model_name in available_model_names:
+                    if self.model_name in model_name or model_name.endswith(self.model_name):
+                        model_found = True
+                        # Update to use the full model name from API
+                        if "/" in model_name:
+                            self.model_name = model_name.split("/")[-1]  # Extract just the model part
+                        break
+                
+                if not model_found:
+                    # Try to find a suitable alternative
+                    for model_name in available_model_names:
+                        if "flash" in model_name.lower() or "pro" in model_name.lower():
+                            suggested = model_name.split("/")[-1] if "/" in model_name else model_name
+                            logger.warning(
+                                "[WARN] Configured model '%s' not found. Suggested alternative: '%s'",
+                                app_settings.gemini_model,
+                                suggested,
+                            )
+                            break
+        except Exception as e:
+            logger.warning("Could not list available models: %s", e)
 
     def format_sensor_data_for_ai(
         self,
@@ -157,21 +200,80 @@ Respond with ONLY the JSON object, no additional text."""
 
             # Log comprehensive AI analysis request
             logger.info(
-                f"🤖 Calling Gemini AI for crash analysis | model={self.model_name} | "
-                f"sensor_data_points={len(sensor_data)} | context_seconds={context_seconds} | "
-                f"current_reading: ax={current_reading.get('ax', 0):.2f}, "
-                f"ay={current_reading.get('ay', 0):.2f}, az={current_reading.get('az', 0):.2f} | "
-                f"roll={current_reading.get('roll', 0):.1f}°, pitch={current_reading.get('pitch', 0):.1f}° | "
-                f"tilt_detected={current_reading.get('tilt_detected', False)} | prompt_length={len(prompt)}"
+                "[AI] Calling Gemini AI for crash analysis | model=%s | "
+                "sensor_data_points=%s | context_seconds=%s | "
+                "current_reading: ax=%.2f, ay=%.2f, az=%.2f | "
+                "roll=%.1f deg, pitch=%.1f deg | "
+                "tilt_detected=%s | prompt_length=%s",
+                self.model_name,
+                len(sensor_data),
+                context_seconds,
+                current_reading.get('ax', 0),
+                current_reading.get('ay', 0),
+                current_reading.get('az', 0),
+                current_reading.get('roll', 0),
+                current_reading.get('pitch', 0),
+                current_reading.get('tilt_detected', False),
+                len(prompt),
             )
 
             # Generate content using the new API
             # Note: The exact API structure for google.genai may vary
             # Please refer to the official documentation: https://github.com/google-gemini/generative-ai-python
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-            )
+            
+            # Try different model name formats and fallback models
+            # v1beta API has deprecated many models, so we try multiple options
+            models_to_try = [
+                self.model_name,  # Try configured model first
+                f"models/{self.model_name}",  # Try with models/ prefix
+            ]
+            
+            # Add fallback models (newer models that should work)
+            fallback_models = [
+                "gemini-2.0-flash-exp",
+                "models/gemini-2.0-flash-exp",
+                "gemini-2.5-flash",
+                "models/gemini-2.5-flash",
+                "gemini-pro",
+                "models/gemini-pro",
+            ]
+            
+            # Only add fallbacks if they're different from configured model
+            for fallback in fallback_models:
+                if fallback not in models_to_try and self.model_name not in fallback:
+                    models_to_try.append(fallback)
+            
+            response = None
+            last_error = None
+            for model_to_try in models_to_try:
+                try:
+                    logger.debug("[DEBUG] Trying model: %s", model_to_try)
+                    response = self.client.models.generate_content(
+                        model=model_to_try,
+                        contents=prompt,
+                    )
+                    # Success! Update model_name for future use
+                    if model_to_try != self.model_name and model_to_try != f"models/{self.model_name}":
+                        logger.info(
+                            "[INFO] Successfully using fallback model: %s (configured: %s)",
+                            model_to_try,
+                            self.model_name,
+                        )
+                        # Store without models/ prefix for consistency
+                        self.model_name = model_to_try.split("/")[-1]
+                    break
+                except Exception as e:
+                    last_error = e
+                    error_str = str(e)
+                    # If it's a 404/model not found, try next model
+                    if "404" in error_str or "not found" in error_str.lower():
+                        continue
+                    # For other errors, re-raise immediately
+                    raise
+            
+            if response is None:
+                # All models failed
+                raise last_error or Exception("All model attempts failed")
 
             # Parse response - access text from the response object
             # The exact structure may vary between API versions, so we handle multiple formats
@@ -219,30 +321,53 @@ Respond with ONLY the JSON object, no additional text."""
 
             # Log comprehensive AI analysis result
             logger.info(
-                f"✅ Gemini AI analysis complete | model={self.model_name} | "
-                f"is_crash={ai_result['is_crash']} | confidence={ai_result['confidence']:.2f} | "
-                f"severity={ai_result['severity']} | crash_type={ai_result['crash_type']} | "
-                f"false_positive_risk={ai_result['false_positive_risk']:.2f} | "
-                f"key_indicators={len(ai_result['key_indicators'])} | "
-                f"reasoning_length={len(ai_result['reasoning'])} | "
-                f"reasoning={ai_result['reasoning'][:150]}..."
+                "[OK] Gemini AI analysis complete | model=%s | "
+                "is_crash=%s | confidence=%.2f | "
+                "severity=%s | crash_type=%s | "
+                "false_positive_risk=%.2f | "
+                "key_indicators=%s | "
+                "reasoning_length=%s | "
+                "reasoning=%s...",
+                self.model_name,
+                ai_result['is_crash'],
+                ai_result['confidence'],
+                ai_result['severity'],
+                ai_result['crash_type'],
+                ai_result['false_positive_risk'],
+                len(ai_result['key_indicators']),
+                len(ai_result['reasoning']),
+                ai_result['reasoning'][:150],
             )
 
             return ai_result
 
         except json.JSONDecodeError as e:
             logger.error(
-                f"❌ Failed to parse Gemini response as JSON | model={self.model_name} | "
-                f"error={str(e)} | response_text_length={len(response_text)} | "
-                f"response_preview={response_text[:200]}..."
+                "[ERROR] Failed to parse Gemini response as JSON | model=%s | "
+                "error=%s | response_text_length=%s | response_preview=%s...",
+                self.model_name,
+                str(e),
+                len(response_text),
+                response_text[:200],
             )
             return self._default_response()
         except Exception as e:
+            error_str = str(e)
             logger.error(
-                f"❌ Error calling Gemini API | model={self.model_name} | "
-                f"error={str(e)} | error_type={type(e).__name__}",
+                "[ERROR] Error calling Gemini API | model=%s | error=%s | error_type=%s",
+                self.model_name,
+                error_str,
+                type(e).__name__,
                 exc_info=True,
             )
+            
+            # If model not found, suggest alternative models
+            if "404" in error_str or "not found" in error_str.lower():
+                logger.warning(
+                    "[WARN] Model '%s' not available. Try: 'gemini-1.5-flash' or 'gemini-pro'",
+                    self.model_name,
+                )
+            
             return self._default_response()
 
     def _default_response(self) -> dict[str, Any]:

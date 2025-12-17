@@ -113,8 +113,8 @@ class Settings(BaseSettings):
         description="Google Gemini API key for crash analysis",
     )
     gemini_model: str = Field(
-        default="gemini-pro",
-        description="Gemini model name to use",
+        default="gemini-2.0-flash-exp",
+        description="Gemini model name to use. Try: 'gemini-2.0-flash-exp', 'gemini-2.5-flash', 'gemini-2.5-pro', or 'gemini-pro'",
     )
     gemini_analysis_lookback_seconds: int = Field(
         default=30,

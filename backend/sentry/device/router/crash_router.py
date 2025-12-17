@@ -27,21 +27,21 @@ def crash_alert_endpoint(
     URL: /api/v1/device/crash/alert
     """
     logger.info(
-        "📥 POST /api/v1/device/crash/alert - Crash alert endpoint called (device_id=%s, timestamp=%s)",
+        "[IN] POST /api/v1/device/crash/alert - Crash alert endpoint called (device_id=%s, timestamp=%s)",
         payload.device_id,
         payload.timestamp,
     )
     try:
         response = process_crash_alert(request, payload)
         logger.info(
-            "✅ POST /api/v1/device/crash/alert - Successfully processed (device_id=%s, is_crash=%s)",
+            "[OK] POST /api/v1/device/crash/alert - Successfully processed (device_id=%s, is_crash=%s)",
             payload.device_id,
             response.is_crash,
         )
         return response
     except Exception as e:
         logger.error(
-            "❌ POST /api/v1/device/crash/alert - Error processing crash alert (device_id=%s)",
+            "[ERROR] POST /api/v1/device/crash/alert - Error processing crash alert (device_id=%s)",
             payload.device_id,
             exc_info=True,
         )

@@ -177,13 +177,13 @@ def register(
     )
     if email_sent:
         logger.info(
-            "✅ Verification email sent successfully for new user | email=%s | user_id=%s",
+            "[OK] Verification email sent successfully for new user | email=%s | user_id=%s",
             user.email,
             user.id,
         )
     else:
         logger.error(
-            "❌ Failed to send verification email for new user | email=%s | user_id=%s",
+            "[ERROR] Failed to send verification email for new user | email=%s | user_id=%s",
             user.email,
             user.id,
         )
@@ -334,7 +334,7 @@ def send_verification_email_controller(
     except User.DoesNotExist:
         # Don't reveal if email exists or not for security
         logger.warning(
-            "⚠️ Email verification requested for non-existent email | email=%s",
+            "[WARN] Email verification requested for non-existent email | email=%s",
             data.email,
         )
         return MessageResponse(message=AuthMessages.EmailVerification.EMAIL_SENT)
@@ -366,14 +366,14 @@ def send_verification_email_controller(
 
     if email_sent:
         logger.info(
-            "✅ Email verification email sent successfully | email=%s | user_id=%s | user_name=%s",
+            "[OK] Email verification email sent successfully | email=%s | user_id=%s | user_name=%s",
             user.email,
             user.id,
             user_name,
         )
     else:
         logger.error(
-            "❌ Failed to send email verification email | email=%s | user_id=%s | user_name=%s",
+            "[ERROR] Failed to send email verification email | email=%s | user_id=%s | user_name=%s",
             user.email,
             user.id,
             user_name,
@@ -500,7 +500,7 @@ def forgot_password_controller(
     except User.DoesNotExist:
         # Don't reveal if email exists or not for security
         logger.warning(
-            "⚠️ Password reset requested for non-existent or inactive email | email=%s",
+            "[WARN] Password reset requested for non-existent or inactive email | email=%s",
             data.email,
         )
         return MessageResponse(message=AuthMessages.PasswordReset.EMAIL_SENT)
@@ -524,14 +524,14 @@ def forgot_password_controller(
 
     if email_sent:
         logger.info(
-            "✅ Password reset email sent successfully via SMTP | email=%s | user_id=%s | user_name=%s",
+            "[OK] Password reset email sent successfully via SMTP | email=%s | user_id=%s | user_name=%s",
             user.email,
             user.id,
             user_name,
         )
     else:
         logger.error(
-            "❌ Failed to send password reset email via SMTP | email=%s | user_id=%s | user_name=%s",
+            "[ERROR] Failed to send password reset email via SMTP | email=%s | user_id=%s | user_name=%s",
             user.email,
             user.id,
             user_name,

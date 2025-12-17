@@ -251,3 +251,109 @@ INFO 2025-12-17 23:27:27 auth_controller Email: ''
 INFO 2025-12-17 23:27:27 auth_controller Password present: True
 INFO 2025-12-17 23:27:27 auth_controller =========================
 INFO 2025-12-17 23:27:27 auth_controller Attempting authentication for identifier: 'sentry'
+INFO 2025-12-18 01:32:30 gemini_service [AI] Calling Gemini AI for crash analysis | model=gemini-1.5-pro | sensor_data_points=0 | context_seconds=30 | current_reading: ax=0.29, ay=0.01, az=-0.43 | roll=179.2 deg, pitch=-33.8 deg | tilt_detected=True | prompt_length=1258
+ERROR 2025-12-18 01:32:31 gemini_service [ERROR] Error calling Gemini API | model=gemini-1.5-pro | error=404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}} | error_type=ClientError
+Traceback (most recent call last):
+  File "D:\Projects\Sentry-App\backend\sentry\core\ai\gemini_service.py", line 180, in analyze_crash_data
+    response = self.client.models.generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\models.py", line 5230, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\models.py", line 4012, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1388, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1224, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\tenacity\__init__.py", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\tenacity\__init__.py", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\tenacity\__init__.py", line 420, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\tenacity\__init__.py", line 187, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ramil\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ramil\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\tenacity\__init__.py", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1201, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\errors.py", line 121, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\errors.py", line 146, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+INFO 2025-12-18 01:37:17 gemini_service [AI] Calling Gemini AI for crash analysis | model=gemini-1.5-flash | sensor_data_points=0 | context_seconds=30 | current_reading: ax=0.19, ay=-0.15, az=-0.45 | roll=-161.6 deg, pitch=-22.1 deg | tilt_detected=True | prompt_length=1260
+ERROR 2025-12-18 01:37:17 gemini_service [ERROR] Error calling Gemini API | model=gemini-1.5-flash | error=404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}} | error_type=ClientError
+Traceback (most recent call last):
+  File "D:\Projects\Sentry-App\backend\sentry\core\ai\gemini_service.py", line 180, in analyze_crash_data
+    response = self.client.models.generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\models.py", line 5230, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\models.py", line 4012, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1388, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1224, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\tenacity\__init__.py", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\tenacity\__init__.py", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\tenacity\__init__.py", line 420, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\tenacity\__init__.py", line 187, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ramil\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ramil\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\tenacity\__init__.py", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1201, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\errors.py", line 121, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "D:\Projects\Sentry-App\backend\venv\Lib\site-packages\google\genai\errors.py", line 146, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+WARNING 2025-12-18 01:37:17 gemini_service [WARN] Model 'gemini-1.5-flash' not available. Try: 'gemini-1.5-flash' or 'gemini-pro'
+INFO 2025-12-18 01:43:59 gemini_service [INFO] Available Gemini models: models/embedding-gecko-001, models/gemini-2.5-flash, models/gemini-2.5-pro, models/gemini-2.0-flash-exp, models/gemini-2.0-flash, models/gemini-2.0-flash-001, models/gemini-2.0-flash-exp-image-generation, models/gemini-2.0-flash-lite-001, models/gemini-2.0-flash-lite, models/gemini-2.0-flash-lite-preview-02-05
+INFO 2025-12-18 01:43:59 gemini_service [AI] Calling Gemini AI for crash analysis | model=gemini-2.0-flash-exp | sensor_data_points=0 | context_seconds=30 | current_reading: ax=0.25, ay=-0.02, az=-0.43 | roll=-177.8 deg, pitch=-30.1 deg | tilt_detected=True | prompt_length=1260
+INFO 2025-12-18 01:44:01 gemini_service [OK] Gemini AI analysis complete | model=gemini-2.0-flash-exp | is_crash=False | confidence=0.30 | severity=low | crash_type=false_positive | false_positive_risk=0.70 | key_indicators=2 | reasoning_length=292 | reasoning=The calculated G-force is relatively low (0.05g) despite the tilt alert. The tilt is significant, but could be due to helmet removal or the rider lean...
+INFO 2025-12-18 01:44:27 gemini_service [INFO] Available Gemini models: models/embedding-gecko-001, models/gemini-2.5-flash, models/gemini-2.5-pro, models/gemini-2.0-flash-exp, models/gemini-2.0-flash, models/gemini-2.0-flash-001, models/gemini-2.0-flash-exp-image-generation, models/gemini-2.0-flash-lite-001, models/gemini-2.0-flash-lite, models/gemini-2.0-flash-lite-preview-02-05
+INFO 2025-12-18 01:44:27 gemini_service [AI] Calling Gemini AI for crash analysis | model=gemini-2.0-flash-exp | sensor_data_points=0 | context_seconds=30 | current_reading: ax=-0.40, ay=-0.19, az=-0.14 | roll=-125.4 deg, pitch=59.0 deg | tilt_detected=True | prompt_length=1260
+INFO 2025-12-18 01:44:29 gemini_service [OK] Gemini AI analysis complete | model=gemini-2.0-flash-exp | is_crash=False | confidence=0.30 | severity=low | crash_type=false_positive | false_positive_risk=0.70 | key_indicators=2 | reasoning_length=424 | reasoning=The G-force is low (0.05g). The tilt angles are extreme (roll=-125.4°, pitch=59.0°), but the low G-force suggests the helmet might have been removed r...
+INFO 2025-12-18 01:44:41 gemini_service [INFO] Available Gemini models: models/embedding-gecko-001, models/gemini-2.5-flash, models/gemini-2.5-pro, models/gemini-2.0-flash-exp, models/gemini-2.0-flash, models/gemini-2.0-flash-001, models/gemini-2.0-flash-exp-image-generation, models/gemini-2.0-flash-lite-001, models/gemini-2.0-flash-lite, models/gemini-2.0-flash-lite-preview-02-05
+INFO 2025-12-18 01:44:43 gemini_service [AI] Calling Gemini AI for crash analysis | model=gemini-2.0-flash-exp | sensor_data_points=0 | context_seconds=30 | current_reading: ax=-0.39, ay=-0.09, az=-0.29 | roll=-162.2 deg, pitch=52.4 deg | tilt_detected=True | prompt_length=1260
+INFO 2025-12-18 01:44:45 gemini_service [OK] Gemini AI analysis complete | model=gemini-2.0-flash-exp | is_crash=False | confidence=0.30 | severity=low | crash_type=false_positive | false_positive_risk=0.70 | key_indicators=1 | reasoning_length=218 | reasoning=The G-force is low (0.05g), which is unlikely for a crash. The tilt is significant, but could be caused by helmet removal or a dropped helmet. Without...
+INFO 2025-12-18 01:45:19 gemini_service [INFO] Available Gemini models: models/embedding-gecko-001, models/gemini-2.5-flash, models/gemini-2.5-pro, models/gemini-2.0-flash-exp, models/gemini-2.0-flash, models/gemini-2.0-flash-001, models/gemini-2.0-flash-exp-image-generation, models/gemini-2.0-flash-lite-001, models/gemini-2.0-flash-lite, models/gemini-2.0-flash-lite-preview-02-05
+INFO 2025-12-18 01:45:20 gemini_service [AI] Calling Gemini AI for crash analysis | model=gemini-2.0-flash-exp | sensor_data_points=0 | context_seconds=30 | current_reading: ax=0.28, ay=0.23, az=-0.37 | roll=147.6 deg, pitch=-32.3 deg | tilt_detected=True | prompt_length=1258
+INFO 2025-12-18 01:45:22 gemini_service [OK] Gemini AI analysis complete | model=gemini-2.0-flash-exp | is_crash=False | confidence=0.30 | severity=low | crash_type=false_positive | false_positive_risk=0.70 | key_indicators=1 | reasoning_length=252 | reasoning=The G-force is relatively low (0.05g). The tilt is significant, but without historical data to show a sudden change, it's more likely a false positive...
+INFO 2025-12-18 01:45:36 gemini_service [INFO] Available Gemini models: models/embedding-gecko-001, models/gemini-2.5-flash, models/gemini-2.5-pro, models/gemini-2.0-flash-exp, models/gemini-2.0-flash, models/gemini-2.0-flash-001, models/gemini-2.0-flash-exp-image-generation, models/gemini-2.0-flash-lite-001, models/gemini-2.0-flash-lite, models/gemini-2.0-flash-lite-preview-02-05
+INFO 2025-12-18 01:45:37 gemini_service [AI] Calling Gemini AI for crash analysis | model=gemini-2.0-flash-exp | sensor_data_points=0 | context_seconds=30 | current_reading: ax=0.55, ay=-0.06, az=-0.14 | roll=-156.2 deg, pitch=-73.8 deg | tilt_detected=True | prompt_length=1260
+INFO 2025-12-18 01:45:39 gemini_service [OK] Gemini AI analysis complete | model=gemini-2.0-flash-exp | is_crash=True | confidence=0.75 | severity=medium | crash_type=fall | false_positive_risk=0.25 | key_indicators=3 | reasoning_length=274 | reasoning=The extreme roll and pitch angles, combined with the tilt detection and acceleration, suggest a fall. While the G-force is relatively low, the unusual...

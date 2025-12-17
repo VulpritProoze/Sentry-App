@@ -51,9 +51,9 @@ def process_crash_alert(
             else "GPS: no data"
         )
         logger.info(
-            "📥 Crash alert received | device_id=%s | timestamp=%s | "
+            "[IN] Crash alert received | device_id=%s | timestamp=%s | "
             "threshold_severity=%s | trigger_type=%s | g_force=%.2fg | "
-            "sensor: ax=%.2f, ay=%.2f, az=%.2f | roll=%.1f°, pitch=%.1f° | "
+            "sensor: ax=%.2f, ay=%.2f, az=%.2f | roll=%.1f deg, pitch=%.1f deg | "
             "tilt_detected=%s | %s",
             data.device_id,
             data.timestamp,
@@ -80,7 +80,7 @@ def process_crash_alert(
             lookback_seconds=30,
         )
         logger.info(
-            "📊 Retrieved %s sensor data points for context (device_id=%s)",
+            "[DATA] Retrieved %s sensor data points for context (device_id=%s)",
             len(recent_data),
             data.device_id,
         )
@@ -96,14 +96,14 @@ def process_crash_alert(
         }
 
         # Call Gemini AI for analysis
-        logger.info("🤖 Calling Gemini AI for crash analysis (device_id=%s)", data.device_id)
+        logger.info("[AI] Calling Gemini AI for crash analysis (device_id=%s)", data.device_id)
         ai_analysis = gemini_service.analyze_crash_data(
             sensor_data=recent_data,
             current_reading=current_reading,
             context_seconds=30,
         )
         logger.info(
-            "✅ AI analysis complete | device_id=%s | is_crash=%s | confidence=%.2f | "
+            "[OK] AI analysis complete | device_id=%s | is_crash=%s | confidence=%.2f | "
             "severity=%s | crash_type=%s | false_positive_risk=%.2f | reasoning=%s...",
             data.device_id,
             ai_analysis["is_crash"],
@@ -118,7 +118,7 @@ def process_crash_alert(
         crash_event = None
         if ai_analysis["is_crash"]:
             logger.info(
-                "🚨 Crash confirmed by AI - creating CrashEvent (device_id=%s, severity=%s, confidence=%.2f)",
+                "[CRASH] Crash confirmed by AI - creating CrashEvent (device_id=%s, severity=%s, confidence=%.2f)",
                 data.device_id,
                 ai_analysis["severity"],
                 ai_analysis["confidence"],
@@ -138,14 +138,14 @@ def process_crash_alert(
                     gps_fix = data.gps_data.fix
                     gps_satellites = data.gps_data.satellites
                     logger.info(
-                        "📍 GPS location available: (%s, %s) with %s satellites (device_id=%s)",
+                        "[GPS] GPS location available: (%s, %s) with %s satellites (device_id=%s)",
                         gps_latitude,
                         gps_longitude,
                         gps_satellites,
                         data.device_id,
                     )
                 else:
-                    logger.warning("⚠️ No GPS fix available at crash time (device_id=%s)", data.device_id)
+                    logger.warning("[WARN] No GPS fix available at crash time (device_id=%s)", data.device_id)
 
                 crash_event = CrashEvent.objects.create(  # type: ignore[attr-defined]
                     device_id=data.device_id,
@@ -176,7 +176,7 @@ def process_crash_alert(
                     satellites_at_crash=gps_satellites,
                 )
                 logger.info(
-                    "💾 CrashEvent created successfully | crash_event_id=%s | device_id=%s | "
+                    "[SAVE] CrashEvent created successfully | crash_event_id=%s | device_id=%s | "
                     "severity=%s | confidence=%.2f",  # type: ignore[attr-defined]
                     crash_event.id,  # type: ignore[attr-defined]
                     data.device_id,
@@ -187,7 +187,7 @@ def process_crash_alert(
                 # Send FCM push notification
                 if ai_analysis["severity"] in ["high", "medium"]:
                     logger.info(
-                        "📱 Sending FCM push notification (device_id=%s, severity=%s, crash_event_id=%s)",  # type: ignore[attr-defined]
+                        "[FCM] Sending FCM push notification (device_id=%s, severity=%s, crash_event_id=%s)",  # type: ignore[attr-defined]
                         data.device_id,
                         ai_analysis["severity"],
                         crash_event.id,  # type: ignore[attr-defined]
@@ -198,13 +198,13 @@ def process_crash_alert(
                         ai_analysis=ai_analysis,
                     )
                     if notification_sent:
-                        logger.info("✅ FCM notification sent successfully (device_id=%s)", data.device_id)
+                        logger.info("[OK] FCM notification sent successfully (device_id=%s)", data.device_id)
                     else:
-                        logger.warning("⚠️ FCM notification failed to send (device_id=%s)", data.device_id)
+                        logger.warning("[WARN] FCM notification failed to send (device_id=%s)", data.device_id)
 
                     # Send GPS location to loved ones
                     logger.info(
-                        "👥 Notifying loved ones with GPS location (device_id=%s, crash_event_id=%s)",  # type: ignore[attr-defined]
+                        "[LOVED_ONES] Notifying loved ones with GPS location (device_id=%s, crash_event_id=%s)",  # type: ignore[attr-defined]
                         data.device_id,
                         crash_event.id,  # type: ignore[attr-defined]
                     )
@@ -214,7 +214,7 @@ def process_crash_alert(
                     )
         else:
             logger.info(
-                "✅ False positive detected by AI - no crash event created "
+                "[OK] False positive detected by AI - no crash event created "
                 "(device_id=%s, confidence=%.2f, false_positive_risk=%.2f)",
                 data.device_id,
                 ai_analysis["confidence"],
@@ -222,7 +222,7 @@ def process_crash_alert(
             )
 
         logger.info(
-            "📤 Crash alert processing complete | device_id=%s | is_crash=%s | "
+            "[OUT] Crash alert processing complete | device_id=%s | is_crash=%s | "
             "crash_event_created=%s | crash_event_id=%s",  # type: ignore[attr-defined]
             data.device_id,
             ai_analysis["is_crash"],

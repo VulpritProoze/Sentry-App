@@ -52,7 +52,7 @@ def send_email(
         plain_message = strip_tags(html_message)
 
         logger.info(
-            "📧 Attempting to send email via SMTP | recipient=%s | subject=%s | template=%s | from_email=%s",
+            "[EMAIL] Attempting to send email via SMTP | recipient=%s | subject=%s | template=%s | from_email=%s",
             recipient_email,
             subject,
             html_template,
@@ -70,7 +70,7 @@ def send_email(
         )
 
         logger.info(
-            "✅ Email sent successfully via SMTP | recipient=%s | subject=%s | template=%s",
+            "[OK] Email sent successfully via SMTP | recipient=%s | subject=%s | template=%s",
             recipient_email,
             subject,
             html_template,
@@ -78,7 +78,7 @@ def send_email(
         return True
     except Exception as e:  # noqa: BLE001
         logger.error(
-            "❌ Failed to send email via SMTP | recipient=%s | subject=%s | template=%s | error=%s",
+            "[ERROR] Failed to send email via SMTP | recipient=%s | subject=%s | template=%s | error=%s",
             recipient_email,
             subject,
             html_template,
