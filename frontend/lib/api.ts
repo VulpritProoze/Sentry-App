@@ -29,6 +29,69 @@ const deviceApi = axios.create({
   },
 });
 
+// Request interceptor for deviceApi (adds JWT token for mobile endpoints)
+deviceApi.interceptors.request.use(
+  async (config: InternalAxiosRequestConfig) => {
+    // Only add JWT token for mobile endpoints (which use JWT auth)
+    // Other endpoints like /data use API key auth
+    if (config.url?.startsWith('/mobile/')) {
+      const token = await getStoredToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor for deviceApi (401 handling for mobile endpoints)
+deviceApi.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
+    
+    // Only handle 401 for mobile endpoints (which use JWT auth)
+    if (error.response?.status === 401 && 
+        originalRequest.url?.startsWith('/mobile/') && 
+        !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      try {
+        // Call refresh endpoint
+        const refreshToken = await getStoredRefreshToken();
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
+        
+        const response = await axios.post(`${API_URL}/core/auth/refresh`, {
+          refresh_token: refreshToken,
+        });
+        
+        // Store new tokens
+        await storeTokens(response.data.access_token, response.data.refresh_token);
+        
+        // Retry original request with new token
+        originalRequest.headers.Authorization = `Bearer ${response.data.access_token}`;
+        return deviceApi(originalRequest);
+      } catch (refreshError: any) {
+        // Refresh failed, logout user
+        await clearStoredTokens();
+        if (logoutCallback) {
+          logoutCallback();
+        }
+        return Promise.reject(refreshError);
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
 // Request interceptor for coreApi
 coreApi.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {

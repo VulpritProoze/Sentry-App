@@ -5,8 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d7e179ce-de74-4416-8f69-f46e3203c935" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/API_INTEGRATION_WITH_NATIVE.md" beforeDir="false" afterPath="$PROJECT_DIR$/API_INTEGRATION_WITH_NATIVE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/sentry/device/router/device_router.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/sentry/device/router/device_router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/sentry/device/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/sentry/device/schemas/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/sentry/logs/sentry.log" beforeDir="false" afterPath="$PROJECT_DIR$/backend/sentry/logs/sentry.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/BLUETOOTH_MANAGEMENT.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/(tabs)/home.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(tabs)/home.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,9 +28,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="36vFkadkuznjzZABnHE6SHmKbuC" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -36,7 +45,9 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "last_opened_file_path": "D:/User Folder/Magus Files/RRA Personal Folder/HelloWorld/React Native/Sentry/Sentry-App"
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "D:/User Folder/Magus Files/RRA Personal Folder/HelloWorld/React Native/Sentry/Sentry-App",
+    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle"
   }
 }]]></component>
   <component name="TaskManager">

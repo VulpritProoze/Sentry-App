@@ -5,6 +5,7 @@ from .crash_schema import (
     ThresholdResult,
 )
 from .device_schema import DeviceDataRequest, DeviceDataResponse
+from .fcm_schema import FCMTokenRequest, FCMTokenResponse
 
 __all__ = [
     "DeviceDataRequest",
@@ -13,4 +14,6 @@ __all__ = [
     "CrashAlertResponse",
     "SensorReading",
     "ThresholdResult",
+    "FCMTokenRequest",
+    "FCMTokenResponse",
 ]

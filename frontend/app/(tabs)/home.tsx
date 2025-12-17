@@ -8,6 +8,8 @@ import {
   Mail,
   RefreshCw,
   Bluetooth,
+  Bell,
+  BellOff,
 } from "@tamagui/lucide-icons";
 import React, { useState, useEffect } from "react";
 import {
@@ -29,6 +31,7 @@ import { useCrashDetection } from "@/hooks/useCrashDetection";
 import { SensorDisplay } from "@/components/device/SensorDisplay";
 import { CrashIndicator } from "@/components/crash/CrashIndicator";
 import { CrashAlert } from "@/components/crash/CrashAlert";
+import { useFCM } from "@/hooks/useFCM";
 
 const home = () => {
   const colors = useThemeColors();
@@ -51,6 +54,16 @@ const home = () => {
       );
     },
   });
+
+  // Notification setup
+  const { 
+    pushToken, 
+    isRegistered, 
+    isPeriodicActive, 
+    sendTestNotification, 
+    startPeriodicTest, 
+    stopPeriodicTest 
+  } = useFCM();
 
   // Cooldown timer effect
   useEffect(() => {
@@ -256,6 +269,109 @@ const home = () => {
               Connect to your Sentry device via Bluetooth to receive sensor data
             </Text>
           )}
+        </Card>
+
+        {/* Notification Test Card */}
+        <Card
+          elevate
+          bordered
+          borderColor={colors.border}
+          padded
+          gap={"$4"}
+          enterStyle={{ opacity: 0, y: 10 }}
+          opacity={1}
+          animation={"bouncy"}
+          backgroundColor={colors.cardBackground}
+        >
+          <XStack gap={"$2"} alignItems="center" marginBottom={"$2"}>
+            <Bell color={colors.primary} />
+            <Text color={colors.text} fontSize={"$5"} fontWeight="bold">
+              Notification Testing
+            </Text>
+          </XStack>
+
+          <Text color={colors.gray[200]} fontSize={"$3"} marginBottom={"$2"}>
+            Test Firebase Cloud Messaging notifications
+          </Text>
+
+          <YStack gap={"$3"}>
+            {/* Token Status */}
+            <XStack justifyContent="space-between" paddingBottom={"$2"}>
+              <Text color={colors.text} fontSize={"$4"} fontWeight="600">
+                Push Token Status:
+              </Text>
+              <Text 
+                color={isRegistered ? colors.green[500] : colors.red} 
+                fontSize={"$4"} 
+                fontWeight="bold"
+              >
+                {isRegistered ? "Registered" : "Not Registered"}
+              </Text>
+            </XStack>
+
+            {pushToken && (
+              <YStack gap={"$2"} paddingBottom={"$2"}>
+                <Text color={colors.text} fontSize={"$3"} fontWeight="600">
+                  Token:
+                </Text>
+                <Text color={colors.gray[200]} fontSize={"$2"} numberOfLines={2}>
+                  {pushToken}
+                </Text>
+              </YStack>
+            )}
+
+            {/* Periodic Notification Button */}
+            <Button
+              backgroundColor={isPeriodicActive ? colors.red : colors.primary}
+              onPress={() => {
+                if (isPeriodicActive) {
+                  stopPeriodicTest();
+                } else {
+                  startPeriodicTest(5); // Every 5 seconds
+                }
+              }}
+            >
+              <XStack gap={"$2"} alignItems="center">
+                {isPeriodicActive ? (
+                  <>
+                    <BellOff size={16} color="#ffffff" />
+                    <Text color="#ffffff" fontWeight="semibold">
+                      Stop Periodic Notifications
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Bell size={16} color="#ffffff" />
+                    <Text color="#ffffff" fontWeight="semibold">
+                      Start Periodic Notifications (Every 5s)
+                    </Text>
+                  </>
+                )}
+              </XStack>
+            </Button>
+
+            {/* Single Test Notification Button */}
+            <Button
+              variant="outlined"
+              borderColor={colors.border}
+              borderWidth={1}
+              backgroundColor="transparent"
+              onPress={sendTestNotification}
+            >
+              <XStack gap={"$2"} alignItems="center">
+                <Bell size={16} color={colors.primary} />
+                <Text color={colors.primary} fontWeight="semibold">
+                  Send Test Notification (Once)
+                </Text>
+              </XStack>
+            </Button>
+
+            {isPeriodicActive && (
+              <Text color={colors.green[500]} fontSize={"$3"} textAlign="center" fontWeight="600">
+                ✓ Periodic notifications active (every 5 seconds)
+              </Text>
+            )}
+          </YStack>
         </Card>
 
         <Card

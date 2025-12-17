@@ -52,6 +52,12 @@ venv/
 /static
 dist/
 .ruff_cache/
+backend/sentry/firebase/
+# Firebase credentials
+**/firebase/*.json
+**/*service-account*.json
+**/google-services.json
+**/GoogleService-Info.plist
 # backend/**/logs/
 
 
