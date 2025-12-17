@@ -1,128 +1,98 @@
 #include <Arduino.h>
 #include "MPU6050Handler.h"
-#include "WiFiHandler.h"
 #include "TiltDetection.h"
-#include "APIKeyStorage.h"
-#include "ServerHandler.h"
 #include "GPSHandler.h"
-
-#include <ArduinoJson.h>
-#include "secrets.h"
+#include "BluetoothHandler.h"
 
 // Data collection variables
 unsigned long lastSendTime = 0;
-const unsigned long SEND_INTERVAL = 5000;  // Send every 5 seconds
+const unsigned long SEND_INTERVAL = 2500;  // Send every 2.5 seconds
+
+// Tilt detection configuration
+const float TILT_THRESHOLD = 60.0;  // degrees - adjust for sensitivity (lower = more sensitive)
 
 void setup() {
   Serial.begin(115200);
+  delay(1000);
+  Serial.println("=== SENTRY DEVICE INITIALIZING ===");
 
-  // Connect to Wi-Fi
-  connectWiFi(ssid, password);
+  // Initialize Bluetooth
+  initBluetooth("Sentry-Device");
 
   // Initialize MPU6050
   initMPU();
+  Serial.println("MPU6050 initialized");
 
   // Initialize GPS
   initGPS();
-
-  // Server setup
-  if (!isAPIKeySet()) {
-    setAPIKey(apiKey);
-  }
-  setBaseUrl(apiEndpoint);
+  Serial.println("GPS initialized - Waiting for satellite fix...");
   
   lastSendTime = millis();
-  Serial.println("GPS Integration - JSON payloads will be printed to Serial (server sending disabled for GPS testing)");
+  Serial.println("Device Ready - Waiting for Bluetooth connection...");
 }
 
 void loop() {
-  // Maintain WiFi connection
-  maintainWiFiConnection(ssid, password);
-
-  // Update GPS data
+  // Handle Bluetooth reconnection
+  handleBluetoothReconnection();
+  
+  // Update GPS data (must be called frequently to process NMEA sentences)
   updateGPS();
 
+  // Read sensor data from MPU6050
   float ax, ay, az;
   readAccel(ax, ay, az);
 
-  // Calculate tilt
+  // Calculate tilt angles
   float roll, pitch;
   calculateTilt(ax, ay, az, roll, pitch);
 
-  // Check tilt detection (90 degree threshold)
-  bool currentTilt = isTiltExceeded(roll, pitch, 90.0);
+  // Check if tilt exceeds threshold (accident detection)
+  bool currentTilt = isTiltExceeded(roll, pitch, TILT_THRESHOLD);
 
-  // Serial output for roll, pitch, and tilt detection
-  Serial.print("Roll: "); 
-  Serial.print(roll);
-  Serial.print("°, Pitch: "); 
-  Serial.print(pitch);
-  Serial.print("°, Tilt Detected: ");
-  Serial.println(currentTilt ? "YES" : "NO");
-
-  // Build and print JSON payload every SEND_INTERVAL milliseconds
+  // Send data via Bluetooth every SEND_INTERVAL milliseconds
   unsigned long currentTime = millis();
   if (currentTime - lastSendTime >= SEND_INTERVAL) {
-    // Build JSON payload with sensor and GPS data
-    // Increased size to accommodate GPS data
-    StaticJsonDocument<512> doc;
-    
-    // Sensor data
-    doc["ax"] = ax;
-    doc["ay"] = ay;
-    doc["az"] = az;
-    doc["roll"] = roll;
-    doc["pitch"] = pitch;
-    doc["tilt_detected"] = currentTilt;
-    
-    // GPS data (only include if valid)
-    bool gpsFix = hasGPSFix();
-    doc["gps_fix"] = gpsFix;
-    doc["satellites"] = getSatellites();
-    
-    if (isValidLocation()) {
-      doc["latitude"] = getLatitude();
-      doc["longitude"] = getLongitude();
+    if (isBluetoothConnected()) {
+      // Send real sensor data from MPU6050
+      sendSensorData(ax, ay, az, roll, pitch, currentTilt);
+      
+      if (currentTilt) {
+        Serial.println("BLE: ⚠️ ACCIDENT DETECTED! Sensor data sent");
+      } else {
+        Serial.println("BLE: Sensor data sent");
+      }
+      
+      // Get GPS data
+      bool gpsFix = isValidLocation();
+      int satellites = getSatellites();
+      float latitude = getLatitude();
+      float longitude = getLongitude();
       float altitude = getAltitude();
-      if (altitude != 0.0) {
-        doc["altitude"] = altitude;
+      
+      // Send real GPS data
+      sendGPSData(gpsFix, satellites, latitude, longitude, altitude);
+      if (gpsFix) {
+        Serial.print("BLE: GPS data sent - Lat: ");
+        Serial.print(latitude, 6);
+        Serial.print(", Lng: ");
+        Serial.print(longitude, 6);
+        Serial.print(", Sats: ");
+        Serial.println(satellites);
+      } else {
+        Serial.println("BLE: GPS data sent - No fix yet");
       }
+      
+      // Send device status (no WiFi status needed, use real GPS fix)
+      sendDeviceStatus(false, gpsFix, -1);
+      Serial.println("BLE: Device status sent");
+      
+      Serial.println("---");
     } else {
-      // Set GPS fields to null when no valid fix
-      doc["latitude"] = nullptr;
-      doc["longitude"] = nullptr;
-      doc["altitude"] = nullptr;
-    }
-    
-    // Optional: add device_id and timestamp if needed
-    // doc["device_id"] = "ESP32_001";
-    // doc["timestamp"] = millis();
-    
-    String jsonPayload;
-    serializeJson(doc, jsonPayload);
-    
-    // Print JSON to Serial Monitor (server sending disabled for GPS testing phase)
-    Serial.println("--- JSON Payload ---");
-    Serial.println(jsonPayload);
-    Serial.println("--- End JSON ---");
-    
-    // GPS status info
-    if (gpsFix) {
-      Serial.print("GPS Fix: YES | Satellites: ");
-      Serial.print(getSatellites());
-      if (isValidLocation()) {
-        Serial.print(" | Lat: ");
-        Serial.print(getLatitude(), 6);
-        Serial.print(", Lon: ");
-        Serial.print(getLongitude(), 6);
-      }
-      Serial.println();
-    } else {
-      Serial.println("GPS Fix: NO - Waiting for satellite lock...");
+      Serial.println("BLE: Waiting for connection...");
     }
     
     lastSendTime = currentTime;
   }
 
-  delay(500); // adjust loop speed
+  delay(500);
 }

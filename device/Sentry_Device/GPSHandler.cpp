@@ -14,30 +14,64 @@ static unsigned long lastValidGPSUpdate = 0;
 const unsigned long GPS_DATA_TIMEOUT = 10000; // 10 seconds timeout for stale data
 
 void initGPS() {
-    Serial.println("Initializing GPS...");
-    
     // Initialize Serial2 for GPS at 9600 baud (default Neo 6M baud rate)
     SerialGPS.begin(9600, SERIAL_8N1, 16, 17); // RX=16, TX=17
     
-    Serial.println("GPS Serial initialized at 9600 baud");
-    Serial.println("Waiting for GPS fix (this may take 30-60 seconds for cold start)...");
+    // Test GPS communication - wait a moment and check for incoming data
+    delay(500);
+    int testBytes = 0;
+    unsigned long testStart = millis();
+    while (millis() - testStart < 1000) { // Reduced test time from 2s to 1s
+        if (SerialGPS.available() > 0) {
+            SerialGPS.read(); // Just read, don't print
+            testBytes++;
+        }
+        delay(10);
+    }
 }
 
 bool hasGPSFix() {
     return gps.location.isValid() && gps.location.isUpdated();
 }
 
+// Debug: Track GPS data reception
+static unsigned long lastGPSDataTime = 0;
+static int gpsDataCount = 0;
+static bool gpsReceivingData = false;
+
 void updateGPS() {
     // Read available data from GPS module
+    bool dataReceived = false;
     while (SerialGPS.available() > 0) {
         char c = SerialGPS.read();
+        dataReceived = true;
         if (gps.encode(c)) {
             // Valid NMEA sentence processed
+            gpsDataCount++;
             if (gps.location.isValid()) {
                 lastValidGPSUpdate = millis();
             }
         }
     }
+    
+    // Track if GPS is receiving data
+    if (dataReceived) {
+        lastGPSDataTime = millis();
+        gpsReceivingData = true;
+    } else {
+        // Check if GPS stopped sending data (timeout after 2 seconds)
+        if (millis() - lastGPSDataTime > 2000 && lastGPSDataTime > 0) {
+            gpsReceivingData = false;
+        }
+    }
+}
+
+bool isGPSReceivingData() {
+    return gpsReceivingData;
+}
+
+int getGPSDataCount() {
+    return gpsDataCount;
 }
 
 float getLatitude() {
