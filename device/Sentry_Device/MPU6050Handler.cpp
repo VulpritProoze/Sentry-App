@@ -16,14 +16,9 @@ SimpleKalmanFilter kalmanAz(2, 2, 0.01);
 
 void initMPU() {
     Wire.begin(21, 22);  // SDA = 21, SCL = 22
-
-    Serial.println("Initializing MPU6050...");
     mpu.initialize();
-
-    if (mpu.testConnection()) {
-        Serial.println("MPU6050 connected!");
-    } else {
-        Serial.println("MPU6050 connection FAILED!");
+    if (!mpu.testConnection()) {
+        Serial.println("MPU6050 FAILED!");
         while (1);
     }
 }
