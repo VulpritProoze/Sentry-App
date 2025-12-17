@@ -13,6 +13,17 @@ interface DeviceContextType {
   disconnect: () => Promise<void>;
   startReceiving: () => void;
   stopReceiving: () => void;
+  requestPermissions: () => Promise<boolean>;
+  checkPermissions: () => Promise<boolean>;
+  enableBluetooth: () => Promise<void>;
+  openSettings: () => Promise<void>;
+  getBluetoothState: () => Promise<{
+    state: any;
+    isEnabled: boolean;
+    hasPermissions: boolean;
+    needsPermission: boolean;
+    needsBluetooth: boolean;
+  }>;
 }
 
 const DeviceContext = createContext<DeviceContextType | undefined>(undefined);
@@ -145,6 +156,39 @@ export function DeviceProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isInitialized]);
 
+  const requestPermissions = useCallback(async (): Promise<boolean> => {
+    if (!bleManagerRef.current || !isInitialized) return false;
+    return await bleManagerRef.current.requestPermissions();
+  }, [isInitialized]);
+
+  const checkPermissions = useCallback(async (): Promise<boolean> => {
+    if (!bleManagerRef.current || !isInitialized) return false;
+    return await bleManagerRef.current.checkPermissions();
+  }, [isInitialized]);
+
+  const enableBluetooth = useCallback(async (): Promise<void> => {
+    if (!bleManagerRef.current || !isInitialized) return;
+    await bleManagerRef.current.enableBluetooth();
+  }, [isInitialized]);
+
+  const openSettings = useCallback(async (): Promise<void> => {
+    if (!bleManagerRef.current || !isInitialized) return;
+    await bleManagerRef.current.openSettings();
+  }, [isInitialized]);
+
+  const getBluetoothState = useCallback(async () => {
+    if (!bleManagerRef.current || !isInitialized) {
+      return {
+        state: 'Unknown',
+        isEnabled: false,
+        hasPermissions: false,
+        needsPermission: true,
+        needsBluetooth: true,
+      };
+    }
+    return await bleManagerRef.current.getBluetoothState();
+  }, [isInitialized]);
+
 
   return (
     <DeviceContext.Provider
@@ -157,6 +201,11 @@ export function DeviceProvider({ children }: { children: React.ReactNode }) {
         disconnect,
         startReceiving,
         stopReceiving,
+        requestPermissions,
+        checkPermissions,
+        enableBluetooth,
+        openSettings,
+        getBluetoothState,
       }}
     >
       {children}

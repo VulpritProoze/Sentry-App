@@ -1,6 +1,7 @@
 /** Bluetooth Low Energy (BLE) manager for ESP32 device communication using react-native-ble-plx. */
 
 import { BleManager, Device, Characteristic, State } from 'react-native-ble-plx';
+import { Platform, PermissionsAndroid, Linking, Alert } from 'react-native';
 import { SensorReading, BLEDevice } from '@/types/device';
 import { 
   SENTRY_SERVICE_UUID, 
@@ -28,10 +29,118 @@ export class BLEManager {
   }
 
   /**
+   * Request Bluetooth permissions (Android only)
+   * Android requires location permission for BLE scanning
+   */
+  async requestPermissions(): Promise<boolean> {
+    if (Platform.OS !== 'android') {
+      // iOS handles permissions automatically via Info.plist
+      return true;
+    }
+
+    try {
+      // Android 12+ (API 31+) requires BLUETOOTH_SCAN and BLUETOOTH_CONNECT
+      // Android 6-11 requires ACCESS_FINE_LOCATION for BLE scanning
+      const androidVersion = Platform.Version;
+      
+      if (androidVersion >= 31) {
+        // Android 12+ permissions
+        const permissions = [
+          PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+          PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+        ];
+        
+        const granted = await PermissionsAndroid.requestMultiple(permissions);
+        
+        const allGranted = permissions.every(
+          (permission) => granted[permission] === PermissionsAndroid.RESULTS.GRANTED
+        );
+        
+        if (!allGranted) {
+          console.warn('⚠️ Bluetooth permissions not granted');
+          return false;
+        }
+      } else {
+        // Android 6-11: Need location permission for BLE scanning
+        const locationPermission = PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION;
+        const granted = await PermissionsAndroid.request(locationPermission);
+        
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          console.warn('⚠️ Location permission not granted (required for BLE scanning)');
+          return false;
+        }
+      }
+      
+      console.log('✅ Bluetooth permissions granted');
+      return true;
+    } catch (error) {
+      console.error('❌ Error requesting Bluetooth permissions:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Check if Bluetooth permissions are granted
+   */
+  async checkPermissions(): Promise<boolean> {
+    if (Platform.OS !== 'android') {
+      return true;
+    }
+
+    try {
+      const androidVersion = Platform.Version;
+      
+      if (androidVersion >= 31) {
+        // Android 12+
+        const scanGranted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN
+        );
+        const connectGranted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT
+        );
+        return scanGranted && connectGranted;
+      } else {
+        // Android 6-11
+        const locationGranted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+        return locationGranted;
+      }
+    } catch (error) {
+      console.error('❌ Error checking Bluetooth permissions:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Open system settings for Bluetooth or app permissions
+   */
+  async openSettings(): Promise<void> {
+    try {
+      if (Platform.OS === 'android') {
+        await Linking.openSettings();
+      } else {
+        await Linking.openURL('app-settings:');
+      }
+    } catch (error) {
+      console.error('❌ Error opening settings:', error);
+    }
+  }
+
+  /**
    * Initialize BLE manager and request permissions
    */
   async initialize(): Promise<void> {
     try {
+      // Request permissions first
+      const hasPermissions = await this.checkPermissions();
+      if (!hasPermissions) {
+        const granted = await this.requestPermissions();
+        if (!granted) {
+          throw new Error('Bluetooth permissions not granted');
+        }
+      }
+
       // Wait for BLE manager to be ready
       const state = await this.manager.state();
       
@@ -61,17 +170,58 @@ export class BLEManager {
   }
 
   /**
-   * Enable Bluetooth (Android only - opens system dialog)
+   * Enable Bluetooth (opens system settings)
+   * Note: react-native-ble-plx doesn't have a direct enable method
+   * This will open system settings where user can enable Bluetooth
    */
   async enableBluetooth(): Promise<void> {
     try {
-      // react-native-ble-plx doesn't have a direct enable method
-      // User needs to enable it manually via system settings
-      console.warn('⚠️ Please enable Bluetooth in system settings');
-      throw new Error('Bluetooth must be enabled manually');
+      if (Platform.OS === 'android') {
+        // Try to open Bluetooth settings directly
+        await Linking.openURL('android.settings.BLUETOOTH_SETTINGS');
+      } else {
+        // iOS: Open general settings
+        await Linking.openURL('app-settings:');
+      }
+      console.log('📱 Opened Bluetooth settings');
     } catch (error) {
-      console.error('Error enabling Bluetooth:', error);
-      throw error;
+      console.error('Error opening Bluetooth settings:', error);
+      // Fallback to general settings
+      await this.openSettings();
+    }
+  }
+
+  /**
+   * Get current Bluetooth state with detailed information
+   */
+  async getBluetoothState(): Promise<{
+    state: State;
+    isEnabled: boolean;
+    hasPermissions: boolean;
+    needsPermission: boolean;
+    needsBluetooth: boolean;
+  }> {
+    try {
+      const state = await this.manager.state();
+      const isEnabled = state === State.PoweredOn;
+      const hasPermissions = await this.checkPermissions();
+      
+      return {
+        state,
+        isEnabled,
+        hasPermissions,
+        needsPermission: !hasPermissions,
+        needsBluetooth: !isEnabled,
+      };
+    } catch (error) {
+      console.error('Error getting Bluetooth state:', error);
+      return {
+        state: State.Unknown,
+        isEnabled: false,
+        hasPermissions: false,
+        needsPermission: true,
+        needsBluetooth: true,
+      };
     }
   }
 
@@ -86,10 +236,16 @@ export class BLEManager {
     }
 
     try {
+      // Check permissions first
+      const hasPermissions = await this.checkPermissions();
+      if (!hasPermissions) {
+        throw new Error('Bluetooth permissions not granted. Please grant permissions in settings.');
+      }
+
       const isEnabled = await this.isBluetoothEnabled();
       if (!isEnabled) {
         console.warn('⚠️ Bluetooth is not enabled');
-        throw new Error('Bluetooth is not enabled');
+        throw new Error('Bluetooth is not enabled. Please enable Bluetooth in settings.');
       }
 
       this.scanning = true;
