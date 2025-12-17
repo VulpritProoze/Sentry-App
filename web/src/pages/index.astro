@@ -1,69 +1,238 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import sentryLogo from '../assets/sentry.png';
+import angelaPhoto from '../assets/angela.jpeg';
+import ramPhoto from '../assets/ram.jpg';
+import calebPhoto from '../assets/caleb.jpg';
+import marlouPhoto from '../assets/marlou.jpg';
 ---
 
 <Layout title="Sentry - Crash Detection for Riders">
-	<main class="min-h-screen flex items-center justify-center px-4 pt-16 md:pt-24">
-		<div class="max-w-4xl w-full text-center">
-			<!-- Hero Section -->
-			<div class="mb-16">
-				<h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-4">
-					Sentry
+	<main class="relative min-h-screen px-4 pt-16 md:pt-24 pb-16">
+		<div class="mx-auto w-full max-w-5xl">
+			<div class="text-center mb-14">
+				<div data-anim="badge" class="inline-flex items-center gap-2 rounded-full border border-blue-200/60 bg-white/70 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm shadow-blue-200/30">
+					<span class="h-2 w-2 rounded-full bg-blue-600"></span>
+					Crash detection, designed for riders
+				</div>
+				<h1 data-anim="title" class="mt-6 text-5xl md:text-6xl font-bold tracking-tight">
+					<span class="inline-flex items-center justify-center gap-3">
+						<span data-anim="logo" class="inline-flex h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 overflow-hidden rounded-full">
+							<Image src={sentryLogo} alt="Sentry" class="h-full w-full object-cover object-center scale-[1.8]" />
+						</span>
+						<span class="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 bg-clip-text text-transparent">Sentry</span>
+					</span>
 				</h1>
-				<p class="text-xl md:text-2xl text-gray-600 mb-8">
-					Crash Detection for Motorcycle Riders
+				<p data-anim="tagline" class="mt-4 text-xl md:text-2xl text-slate-700">
+					AI-Powered Crash Detection for Motorists
 				</p>
-				<p class="text-lg text-gray-500 max-w-2xl mx-auto">
+				<p data-anim="desc" class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
 					An IoT device attachable to helmets to help riders inform loved ones in times of emergency
 				</p>
+				<div data-anim="buttons" class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+					<a href="#" class="btn-primary">
+						Download App
+					</a>
+					<a href="#learn-more" class="btn-outline">
+						Learn More
+					</a>
+				</div>
 			</div>
 
-			<!-- Features Grid -->
-			<div class="grid md:grid-cols-3 gap-8 mb-16">
-				<div class="bg-white rounded-lg shadow-md p-6">
+			<div class="grid gap-6 md:grid-cols-3 mb-12">
+				<div class="card" data-anim="feature-card">
 					<div class="text-4xl mb-4">🛡️</div>
-					<h3 class="text-xl font-semibold mb-2">Crash Detection</h3>
-					<p class="text-gray-600">
+					<h3 class="text-xl font-semibold text-slate-900 mb-2">Crash Detection</h3>
+					<p class="text-slate-600">
 						Advanced sensors detect accidents and automatically alert emergency contacts
 					</p>
 				</div>
-				<div class="bg-white rounded-lg shadow-md p-6">
+				<div class="card" data-anim="feature-card">
 					<div class="text-4xl mb-4">📱</div>
-					<h3 class="text-xl font-semibold mb-2">Mobile App</h3>
-					<p class="text-gray-600">
+					<h3 class="text-xl font-semibold text-slate-900 mb-2">Mobile App</h3>
+					<p class="text-slate-600">
 						Manage your device, contacts, and settings through our intuitive mobile application
 					</p>
 				</div>
-				<div class="bg-white rounded-lg shadow-md p-6">
+				<div class="card" data-anim="feature-card">
 					<div class="text-4xl mb-4">⚡</div>
-					<h3 class="text-xl font-semibold mb-2">Real-time Alerts</h3>
-					<p class="text-gray-600">
+					<h3 class="text-xl font-semibold text-slate-900 mb-2">Real-time Alerts</h3>
+					<p class="text-slate-600">
 						Instant notifications to your loved ones when an emergency is detected
 					</p>
 				</div>
 			</div>
 
-			<!-- CTA Section -->
-			<div class="bg-blue-600 rounded-lg shadow-lg p-8 text-white">
-				<h2 class="text-2xl font-bold mb-4">Ready to Get Started?</h2>
-				<p class="text-blue-100 mb-6">
-					Download the Sentry mobile app and connect your device today
-				</p>
-				<div class="flex gap-4 justify-center">
-					<a 
-						href="#" 
-						class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"
-					>
-						Download App
-					</a>
-					<a 
-						href="#" 
-						class="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition"
-					>
-						Learn More
-					</a>
+			<section id="learn-more" class="mt-12">
+				<div class="card" data-anim="learn-more">
+					<div class="max-w-3xl">
+						<div class="text-sm font-semibold text-blue-700">Learn more</div>
+						<h2 class="mt-2 text-3xl font-bold text-slate-900">How Sentry works</h2>
+						<p class="mt-3 text-slate-600">
+							Sentry detects crashes and helps notify your emergency contacts quickly. Built for riders, designed to be simple when it matters most.
+						</p>
+					</div>
+
+					<div class="mt-8 grid gap-4 md:grid-cols-3">
+						<div class="rounded-xl border border-slate-200/70 bg-white/60 p-5" data-anim="learn-more-item">
+							<div class="text-sm font-semibold text-blue-700">1. Detect</div>
+							<div class="mt-2 font-semibold text-slate-900">Impact + motion sensing</div>
+							<div class="mt-2 text-sm text-slate-600">Sensors watch for sudden impacts and unusual movement patterns.</div>
+						</div>
+						<div class="rounded-xl border border-slate-200/70 bg-white/60 p-5" data-anim="learn-more-item">
+							<div class="text-sm font-semibold text-blue-700">2. Confirm</div>
+							<div class="mt-2 font-semibold text-slate-900">Smart alert logic</div>
+							<div class="mt-2 text-sm text-slate-600">Reduce false alarms with signal checks before sending an emergency alert.</div>
+						</div>
+						<div class="rounded-xl border border-slate-200/70 bg-white/60 p-5" data-anim="learn-more-item">
+							<div class="text-sm font-semibold text-blue-700">3. Notify</div>
+							<div class="mt-2 font-semibold text-slate-900">Real-time updates</div>
+							<div class="mt-2 text-sm text-slate-600">Send location and status updates to your emergency contacts instantly.</div>
+						</div>
+					</div>
+
+					<div class="mt-8 rounded-xl border border-slate-200/70 bg-white/60 p-6" data-anim="learn-more-faq">
+						<h3 class="text-lg font-semibold text-slate-900">FAQ</h3>
+						<div class="mt-4 grid gap-4 md:grid-cols-2">
+							<div data-anim="learn-more-faq-item">
+								<div class="font-semibold text-slate-900">Will it work without internet?</div>
+								<div class="mt-1 text-sm text-slate-600">The device can detect a crash, but sending alerts requires connectivity through the phone/app.</div>
+							</div>
+							<div data-anim="learn-more-faq-item">
+								<div class="font-semibold text-slate-900">Does Sentry track me all the time?</div>
+								<div class="mt-1 text-sm text-slate-600">No. The goal is emergency detection and alerts—only the needed info is shared during an event.</div>
+							</div>
+						</div>
+					</div>
 				</div>
-			</div>
+			</section>
+
+			<section id="team" class="mt-12">
+				<div class="card" data-anim="team">
+					<div class="max-w-3xl">
+						<div class="text-sm font-semibold text-blue-700">Our team</div>
+						<h2 class="mt-2 text-3xl font-bold text-slate-900">Meet the people behind Sentry</h2>
+						<p class="mt-3 text-slate-600">
+							A small team building safety tools for riders.
+						</p>
+					</div>
+
+					<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+						<div class="rounded-xl border border-slate-200/70 bg-white/60 p-5" data-anim="team-member">
+							<div class="mx-auto h-24 w-24 overflow-hidden rounded-full border border-slate-200/70 bg-white">
+								<Image src={angelaPhoto} alt="Angela" class="h-full w-full object-cover object-center" />
+							</div>
+							<div class="mt-4 text-center">
+								<div class="text-lg font-semibold text-slate-900">Angela</div>
+								<div class="mt-1 text-sm text-slate-600">AI Specialist</div>
+							</div>
+						</div>
+
+						<div class="rounded-xl border border-slate-200/70 bg-white/60 p-5" data-anim="team-member">
+							<div class="mx-auto h-24 w-24 overflow-hidden rounded-full border border-slate-200/70 bg-white">
+								<Image src={ramPhoto} alt="Ram" class="h-full w-full object-cover object-center" />
+							</div>
+							<div class="mt-4 text-center">
+								<div class="text-lg font-semibold text-slate-900">Ram</div>
+								<div class="mt-1 text-sm text-slate-600">Project Manager</div>
+							</div>
+						</div>
+
+						<div class="rounded-xl border border-slate-200/70 bg-white/60 p-5" data-anim="team-member">
+							<div class="mx-auto h-24 w-24 overflow-hidden rounded-full border border-slate-200/70 bg-white">
+								<Image src={calebPhoto} alt="Caleb" class="h-full w-full object-cover object-center" />
+							</div>
+							<div class="mt-4 text-center">
+								<div class="text-lg font-semibold text-slate-900">Caleb</div>
+								<div class="mt-1 text-sm text-slate-600">Hardware Developer</div>
+							</div>
+						</div>
+
+						<div class="rounded-xl border border-slate-200/70 bg-white/60 p-5" data-anim="team-member">
+							<div class="mx-auto h-24 w-24 overflow-hidden rounded-full border border-slate-200/70 bg-white">
+								<Image src={marlouPhoto} alt="Marlou" class="h-full w-full object-cover object-center" />
+							</div>
+							<div class="mt-4 text-center">
+								<div class="text-lg font-semibold text-slate-900">Marlou</div>
+								<div class="mt-1 text-sm text-slate-600">Mobile App Developer</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
 		</div>
 	</main>
+	<script type="module">
+		import { animate, stagger } from 'motion';
+		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const revealed = new WeakSet();
+
+		function runIntroAnimations() {
+			if (prefersReducedMotion) return;
+			animate('[data-anim="logo"]', { opacity: [0, 1], y: [10, 0] }, { duration: 0.35, delay: 0.02 });
+			animate('[data-anim="badge"]', { opacity: [0, 1], y: [10, 0] }, { duration: 0.35, delay: 0.05 });
+			animate('[data-anim="title"]', { opacity: [0, 1], y: [14, 0] }, { duration: 0.45, delay: 0.10 });
+			animate('[data-anim="tagline"]', { opacity: [0, 1], y: [10, 0] }, { duration: 0.40, delay: 0.18 });
+			animate('[data-anim="desc"]', { opacity: [0, 1], y: [10, 0] }, { duration: 0.40, delay: 0.24 });
+			animate('[data-anim="buttons"]', { opacity: [0, 1], y: [8, 0] }, { duration: 0.40, delay: 0.30 });
+
+			const cards = document.querySelectorAll('[data-anim="feature-card"]');
+			animate(cards, { opacity: [0, 1], y: [14, 0] }, { duration: 0.45, delay: stagger(0.08, { start: 0.35 }) });
+		}
+
+		function setupReveal(target, onReveal) {
+			if (prefersReducedMotion) return;
+			if (!target || revealed.has(target)) return;
+			revealed.add(target);
+			const observer = new IntersectionObserver(
+				(entries) => {
+					entries.forEach((entry) => {
+						if (!entry.isIntersecting) return;
+						onReveal();
+						observer.disconnect();
+					});
+				},
+				{ threshold: 0.2 }
+			);
+			observer.observe(target);
+		}
+
+		function primeElements(nodes) {
+			nodes.forEach((el) => {
+				if (!(el instanceof HTMLElement)) return;
+				el.style.opacity = '0';
+				el.style.transform = 'translateY(14px)';
+			});
+		}
+
+		function setupLearnMoreReveal() {
+			const section = document.querySelector('[data-anim="learn-more"]');
+			const items = Array.from(document.querySelectorAll('[data-anim="learn-more-item"]'));
+			const faq = document.querySelector('[data-anim="learn-more-faq"]');
+			const faqItems = Array.from(document.querySelectorAll('[data-anim="learn-more-faq-item"]'));
+
+			primeElements(items);
+			primeElements([faq, ...faqItems].filter(Boolean));
+
+			setupReveal(section, () => {
+				animate(items, { opacity: [0, 1], y: [14, 0] }, { duration: 0.45, delay: stagger(0.08) });
+				if (faq) animate(faq, { opacity: [0, 1], y: [14, 0] }, { duration: 0.45, delay: 0.25 });
+				animate(faqItems, { opacity: [0, 1], y: [14, 0] }, { duration: 0.40, delay: stagger(0.08, { start: 0.35 }) });
+			});
+		}
+
+		function setupTeamReveal() {
+			const section = document.querySelector('[data-anim="team"]');
+			const members = Array.from(document.querySelectorAll('[data-anim="team-member"]'));
+			primeElements(members);
+			setupReveal(section, () => {
+				animate(members, { opacity: [0, 1], y: [14, 0] }, { duration: 0.45, delay: stagger(0.08) });
+			});
+		}
+
+		runIntroAnimations();
+		setupLearnMoreReveal();
+		setupTeamReveal();
+	</script>
 </Layout>
