@@ -34,6 +34,7 @@ export function DeviceProvider({ children }: { children: React.ReactNode }) {
   const [isScanning, setIsScanning] = useState(false);
   const bleManagerRef = useRef<BLEManager | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const readingCountRef = useRef(0);
 
   // Lazy initialize BLE manager after component mounts (allows native modules to be ready)
   useEffect(() => {
@@ -88,6 +89,19 @@ export function DeviceProvider({ children }: { children: React.ReactNode }) {
     }
     
     bleManagerRef.current.setDataCallback((data: SensorReading) => {
+      readingCountRef.current += 1;
+      // Log every 5 readings to avoid console spam (every ~10 seconds)
+      if (readingCountRef.current % 5 === 0) {
+        console.log(`📥 DeviceContext: Received sensor data (reading #${readingCountRef.current})`, {
+          device_id: data.device_id,
+          ax: data.ax.toFixed(2),
+          ay: data.ay.toFixed(2),
+          az: data.az.toFixed(2),
+          roll: data.roll.toFixed(1),
+          pitch: data.pitch.toFixed(1),
+          tilt_detected: data.tilt_detected,
+        });
+      }
       setCurrentReading(data);
     });
   }, [isInitialized]);

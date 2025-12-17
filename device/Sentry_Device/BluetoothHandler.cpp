@@ -95,6 +95,12 @@ void initBluetooth(const char* deviceName) {
   // Initialize BLE device
   BLEDevice::init(deviceName);
   
+  // [need-review] FIX: Request larger MTU (512 bytes) to send complete JSON messages
+  // Without this, BLE defaults to 20-byte MTU which truncates JSON data
+  // This prevents the issue where only {"type":"sensor_data was being received
+  // Must be called after BLEDevice::init() but before creating server
+  BLEDevice::setMTU(512);
+  
   // Create BLE Server
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());

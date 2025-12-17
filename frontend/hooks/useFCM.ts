@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 import { notificationService } from '@/services/notifications/notificationService';
 import { deviceApi } from '@/lib/api';
 
@@ -15,9 +16,17 @@ export function useFCM() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isPeriodicActive, setIsPeriodicActive] = useState(false);
   const [isSendingBackendTest, setIsSendingBackendTest] = useState(false);
+  const [hasNotificationPermission, setHasNotificationPermission] = useState<boolean | null>(null);
   const notificationListener = useRef<ReturnType<typeof notificationService.setupNotificationListeners>>();
 
   useEffect(() => {
+    // Check notification permission status
+    const checkPermission = async () => {
+      const { status } = await Notifications.getPermissionsAsync();
+      setHasNotificationPermission(status === 'granted');
+    };
+    checkPermission();
+
     // Register for push notifications on mount
     const register = async () => {
       const token = await notificationService.getPushToken();
@@ -106,14 +115,43 @@ export function useFCM() {
     setIsPeriodicActive(false);
   };
 
+  const requestNotificationPermission = async (): Promise<boolean> => {
+    const granted = await notificationService.requestPermissions();
+    if (granted) {
+      // Refresh token after permission granted
+      const token = await notificationService.getPushToken();
+      if (token) {
+        setPushToken(token);
+        setIsRegistered(true);
+        
+        // Send token to backend
+        try {
+          const deviceId = Device.modelName || Device.osName || 'unknown';
+          await deviceApi.post('/mobile/fcm/token', {
+            fcm_token: token,
+            device_id: deviceId,
+            platform: Platform.OS as 'ios' | 'android',
+          });
+          console.log('✅ FCM token registered with backend after permission grant');
+        } catch (error: any) {
+          console.error('❌ Failed to register FCM token with backend:', error?.response?.data || error?.message);
+        }
+      }
+    }
+    setHasNotificationPermission(granted);
+    return granted;
+  };
+
   return {
     pushToken,
     isRegistered,
     isPeriodicActive,
+    hasNotificationPermission,
     sendTestNotification,
     sendBackendTestNotification,
     startPeriodicTest,
     stopPeriodicTest,
+    requestNotificationPermission,
     isSendingBackendTest,
   };
 }

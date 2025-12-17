@@ -11,7 +11,6 @@ import {
   Bell,
   BellOff,
   Search,
-  Loader,
   Settings,
 } from "@tamagui/lucide-icons";
 import React, { useState, useEffect } from "react";
@@ -23,6 +22,7 @@ import {
   Text,
   XStack,
   YStack,
+  Spinner,
 } from "tamagui";
 import { RefreshControl, Platform } from "react-native";
 import { useAuth } from "@/context/AuthContext";
@@ -79,11 +79,13 @@ const home = () => {
   const { 
     pushToken, 
     isRegistered, 
-    isPeriodicActive, 
+    isPeriodicActive,
+    hasNotificationPermission,
     sendTestNotification,
     sendBackendTestNotification, 
     startPeriodicTest, 
     stopPeriodicTest,
+    requestNotificationPermission,
     isSendingBackendTest,
   } = useFCM();
 
@@ -425,7 +427,7 @@ const home = () => {
               >
                 <XStack gap={"$2"} alignItems="center">
                   {isCheckingPermissions ? (
-                    <Loader size={16} color="#ffffff" />
+                    <Spinner size="small" color="#ffffff" />
                   ) : (
                     <Bluetooth size={16} color="#ffffff" />
                   )}
@@ -524,7 +526,7 @@ const home = () => {
               >
                 <XStack gap={"$2"} alignItems="center">
                   {isScanning ? (
-                    <Loader size={16} color="#ffffff" />
+                    <Spinner size="small" color="#ffffff" />
                   ) : (
                     <Search size={16} color="#ffffff" />
                   )}
@@ -563,7 +565,7 @@ const home = () => {
                           </YStack>
                         </XStack>
                         {isConnecting ? (
-                          <Loader size={16} color={colors.primary} />
+                          <Spinner size="small" color={colors.primary} />
                         ) : (
                           <Text color={colors.primary} fontWeight="semibold">
                             Connect
@@ -630,6 +632,45 @@ const home = () => {
           </Text>
 
           <YStack gap={"$3"}>
+            {/* Permission Warning */}
+            {!hasNotificationPermission && !isRegistered && (
+              <Card
+                bordered
+                borderColor={colors.red}
+                backgroundColor={colors.cardBackground}
+                padding={"$3"}
+                marginBottom={"$2"}
+              >
+                <XStack gap={"$2"} alignItems="center" marginBottom={"$2"}>
+                  <AlertTriangle color={colors.red} size={20} />
+                  <Text color={colors.red} fontWeight="bold" fontSize={"$4"}>
+                    Notification Permission Required
+                  </Text>
+                </XStack>
+                <Text color={colors.text} fontSize={"$3"} marginBottom={"$2"}>
+                  Please grant notification permission to receive crash alerts and test notifications.
+                </Text>
+                <Button
+                  backgroundColor={colors.primary}
+                  onPress={async () => {
+                    const granted = await requestNotificationPermission();
+                    if (granted) {
+                      toast.showSuccess("Permission Granted", "Notification permission has been granted.");
+                    } else {
+                      toast.showError("Permission Denied", "Please enable notifications in app settings.");
+                    }
+                  }}
+                >
+                  <XStack gap={"$2"} alignItems="center">
+                    <Bell size={16} color="#ffffff" />
+                    <Text color="#ffffff" fontWeight="semibold">
+                      Grant Notification Permission
+                    </Text>
+                  </XStack>
+                </Button>
+              </Card>
+            )}
+
             {/* Token Status */}
             <XStack justifyContent="space-between" paddingBottom={"$2"}>
               <Text color={colors.text} fontSize={"$4"} fontWeight="600">
