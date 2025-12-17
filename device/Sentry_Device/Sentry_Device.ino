@@ -6,7 +6,7 @@
 
 // Data collection variables
 unsigned long lastSendTime = 0;
-const unsigned long SEND_INTERVAL = 2500;  // Send every 2.5 seconds
+const unsigned long SEND_INTERVAL = 2500;  // Send every 2.5n  seconds
 
 // Tilt detection configuration
 const float TILT_THRESHOLD = 60.0;  // degrees - adjust for sensitivity (lower = more sensitive)
@@ -69,17 +69,31 @@ void loop() {
       float longitude = getLongitude();
       float altitude = getAltitude();
       
-      // Send real GPS data
-      sendGPSData(gpsFix, satellites, latitude, longitude, altitude);
-      if (gpsFix) {
-        Serial.print("BLE: GPS data sent - Lat: ");
+      // Get GPS status message
+      const char* gpsStatusMsg = getGPSStatusMessage();
+      int gpsStatus = getGPSStatus();
+      
+      // Send real GPS data with status message
+      sendGPSData(gpsFix, satellites, latitude, longitude, altitude, gpsStatusMsg);
+      
+      // Display appropriate status message based on GPS state
+      if (gpsStatus == 0) {
+        // GPS device not working
+        Serial.println("BLE: GPS Status - ⚠️ GPS device not working - Check connections");
+      } else if (gpsStatus == 1) {
+        // GPS no signal
+        Serial.print("BLE: GPS Status - ⚠️ No GPS signal detected - Move to open area");
+        Serial.print(" (Satellites: ");
+        Serial.print(satellites);
+        Serial.println(")");
+      } else if (gpsStatus == 2) {
+        // GPS working
+        Serial.print("BLE: GPS Status - ✓ GPS tracking active - Lat: ");
         Serial.print(latitude, 6);
         Serial.print(", Lng: ");
         Serial.print(longitude, 6);
         Serial.print(", Sats: ");
         Serial.println(satellites);
-      } else {
-        Serial.println("BLE: GPS data sent - No fix yet");
       }
       
       // Send device status (no WiFi status needed, use real GPS fix)

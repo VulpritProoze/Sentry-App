@@ -44,7 +44,7 @@ void processBluetoothCommands();
 
 // Data transmission functions
 void sendSensorData(float ax, float ay, float az, float roll, float pitch, bool tiltDetected);
-void sendGPSData(bool gpsFix, int satellites, float latitude, float longitude, float altitude);
+void sendGPSData(bool gpsFix, int satellites, float latitude, float longitude, float altitude, const char* statusMessage = nullptr);
 void sendDeviceStatus(bool wifiConnected, bool gpsFix, int batteryLevel);
 
 // Utility functions

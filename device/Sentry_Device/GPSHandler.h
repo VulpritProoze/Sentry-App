@@ -15,6 +15,9 @@ float getLongitude();
 float getAltitude();
 int getSatellites();
 bool isValidLocation();
+bool isGPSReceivingData();
+const char* getGPSStatusMessage();
+int getGPSStatus(); // Returns: 0=not working, 1=no signal, 2=working
 
 #endif
 

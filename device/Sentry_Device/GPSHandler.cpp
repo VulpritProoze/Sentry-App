@@ -13,6 +13,12 @@ static TinyGPSPlus gps;
 static unsigned long lastValidGPSUpdate = 0;
 const unsigned long GPS_DATA_TIMEOUT = 10000; // 10 seconds timeout for stale data
 
+// Debug: Track GPS data reception
+// Declared here so they're accessible in initGPS()
+static unsigned long lastGPSDataTime = 0;
+static int gpsDataCount = 0;
+static bool gpsReceivingData = false;
+
 void initGPS() {
     // Initialize Serial2 for GPS at 9600 baud (default Neo 6M baud rate)
     SerialGPS.begin(9600, SERIAL_8N1, 16, 17); // RX=16, TX=17
@@ -21,23 +27,31 @@ void initGPS() {
     delay(500);
     int testBytes = 0;
     unsigned long testStart = millis();
-    while (millis() - testStart < 1000) { // Reduced test time from 2s to 1s
+    while (millis() - testStart < 2000) { // Test for 2 seconds to detect if device is working
         if (SerialGPS.available() > 0) {
-            SerialGPS.read(); // Just read, don't print
-            testBytes++;
+            char c = SerialGPS.read();
+            if (gps.encode(c)) {
+                testBytes++;
+            }
         }
         delay(10);
+    }
+    
+    // Initialize GPS data tracking
+    if (testBytes > 0) {
+        lastGPSDataTime = millis();
+        gpsReceivingData = true;
+        Serial.println("GPS: Device detected - Receiving NMEA data");
+    } else {
+        Serial.println("GPS: ⚠️ WARNING - No data received from GPS module");
+        Serial.println("GPS: Check wiring: VCC, GND, TX->GPIO17, RX->GPIO16");
+        gpsReceivingData = false;
     }
 }
 
 bool hasGPSFix() {
     return gps.location.isValid() && gps.location.isUpdated();
 }
-
-// Debug: Track GPS data reception
-static unsigned long lastGPSDataTime = 0;
-static int gpsDataCount = 0;
-static bool gpsReceivingData = false;
 
 void updateGPS() {
     // Read available data from GPS module
@@ -134,5 +148,40 @@ bool isValidLocation() {
     }
     
     return true;
+}
+
+// GPS Status Codes:
+// 0 = GPS device not working (not receiving any data)
+// 1 = GPS no signal (receiving data but no fix)
+// 2 = GPS working (has valid fix)
+int getGPSStatus() {
+    // Check if GPS is receiving data at all
+    if (!isGPSReceivingData()) {
+        return 0; // Device not working
+    }
+    
+    // Check if GPS has valid location fix
+    if (isValidLocation()) {
+        return 2; // Working properly
+    }
+    
+    // GPS is receiving data but no fix
+    return 1; // No signal detected
+}
+
+// Get user-friendly status message
+const char* getGPSStatusMessage() {
+    int status = getGPSStatus();
+    
+    switch (status) {
+        case 0:
+            return "GPS device not working - Check connections";
+        case 1:
+            return "No GPS signal detected - Move to open area";
+        case 2:
+            return "GPS tracking active";
+        default:
+            return "GPS status unknown";
+    }
 }
 

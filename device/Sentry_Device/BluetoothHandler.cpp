@@ -197,13 +197,13 @@ void sendSensorData(float ax, float ay, float az, float roll, float pitch, bool 
 }
 
 // Send GPS data with packet structure
-void sendGPSData(bool gpsFix, int satellites, float latitude, float longitude, float altitude) {
+void sendGPSData(bool gpsFix, int satellites, float latitude, float longitude, float altitude, const char* statusMessage) {
   if (!deviceConnected || pGPSDataChar == nullptr) {
     return;
   }
   
   // Build JSON packet
-  StaticJsonDocument<192> doc;  // Further reduced
+  StaticJsonDocument<256> doc;  // Increased to accommodate status message
   doc["type"] = "gps_data";
   doc["sequence"] = getNextSequenceNumber();
   doc["timestamp"] = millis();
@@ -212,6 +212,11 @@ void sendGPSData(bool gpsFix, int satellites, float latitude, float longitude, f
   JsonObject gps = doc.createNestedObject("gps");
   gps["fix"] = gpsFix;
   gps["satellites"] = satellites;
+  
+  // Add status message if provided
+  if (statusMessage != nullptr) {
+    gps["status_message"] = statusMessage;
+  }
   
   if (gpsFix && latitude != 0.0 && longitude != 0.0) {
     gps["latitude"] = latitude;
